@@ -1,5 +1,6 @@
 let formidable = require('formidable');
-
+let XLSX = require('xlsx');
+let mysql = require('../config').poolLocal;
 
 module.exports = function(app){
 
@@ -161,48 +162,119 @@ module.exports = function(app){
             });
         }
 
-
-
     });
 
     /** POST UPLOADER ROUTES - under - /upload_admin */
-    app.post('/api/apl', function(req, res){
+    app.post('/api/APL', function(req, res){
 
         let form = new formidable.IncomingForm();
 
+        form.parse(req, function(err, fields, file){
+            
+            if(err){return res.send({err: 'Invalid file. Try again.' + err})}
+
+            if(file){
+
+                let excelFile = {
+                    date_upload: new Date(),
+                    path: file.upload_form.path,
+                    name: file.upload_form.name,
+                    type: file.upload_form.type,
+                    date_modified: file.upload_form.lastModifiedDate
+                }
+                
+                let workbook = XLSX.readFile(excelFile.path);
+                let APL_Worksheet = XLSX.utils.sheet_to_json(workbook.Sheets['APL'], {header: 'A'});
+                let cleaned_APL = [];
+
+                // cleaning workbook sheets APL.
+                for(let i=2; i<APL_Worksheet.length; i++){
+
+                    if(APL_Worksheet[i].A){
+                        
+                        let upload_date = new Date();
+
+                        cleaned_APL.push(
+
+                            [APL_Worksheet[i].A,
+                            APL_Worksheet[i].B,
+                            APL_Worksheet[i].C,
+                            upload_date]
+    
+                        );
+                    }
+
+                }
+
+                // bulk insert thanks to dada! wohoo.
+                function insertToAPL(){
+                    return new Promise(function(resolve, reject){
+
+                        mysql.getConnection(function(err, connection){
+                            if(err){ return reject(err) };
+
+                            connection.query({
+                                sql: 'INSERT INTO apl_data (pn, description, items_status_code, upload_date ) VALUES ?',
+                                values: [cleaned_APL]
+                            },  function(err, results){
+                                if(err){ return reject(err) };
+
+                                resolve(results.insertID);
+                            });
+
+                            
+                        connection.release();
+                            
+                        });     
+                        
+                    });
+
+                }
+
+                insertToAPL().then(function(){
+                    res.send({auth:'<span class="fa fa-check"></span> Successfully uploaded'});
+                },  function(err){
+                    res.send({err: '<span class="fa fa-times"></span> Invalid format'});
+                });
+
+            }
+
+        });
+
+
     });
 
-    app.post('/api/scat', function(req, res){
+    app.post('/api/SCAT', function(req, res){
         
         let form = new formidable.IncomingForm();
     });
     
-    app.post('/api/oh', function(req, res){
+    app.post('/api/OH', function(req, res){
         
         let form = new formidable.IncomingForm();
     });
     
-    app.post('/api/po', function(req, res){
+    app.post('/api/PO', function(req, res){
         
         let form = new formidable.IncomingForm();
     });
     
-    app.post('/api/scost', function(req, res){
+    app.post('/api/SCOST', function(req, res){
         
         let form = new formidable.IncomingForm();
     });
     
-    app.post('/api/sllt', function(req, res){
+    app.post('/api/SLLT', function(req, res){
         
         let form = new formidable.IncomingForm();
     });
     
-    app.post('/api/pos', function(req, res){
+    app.post('/api/POS', function(req, res){
         
         let form = new formidable.IncomingForm();
     });
     
-    app.post('/api/por', function(req, res){
+    app.post('/api/POR', function(req, res){
         
         let form = new formidable.IncomingForm();
     });

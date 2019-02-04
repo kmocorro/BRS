@@ -321,127 +321,30 @@
                         </div>
                         <!-- /.box-header -->
                         <div class="box-body">
-                            <div class="form-group">
-                                <label for="upload_apl"><%= label %></label>
-                                <input type="file" id="upload_apl">
-                                
-                                <p class="help-block">File format should be <%= acronym %>.xlsx</p>
-                            </div>
+                            <form id="upload<%= acronym %>">
+                                <div class="form-group">
+                                    <div class="row">
+                                        <div class="col-md-12" style="margin-bottom: 10px;">
+                                            <label for="uploader_form"><%= label %></label>
+                                            <input type="file" id="upload_form" name="upload_form" required>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div id="responseDiv<%= acronym %>">
+                                            <!-- response here-->
+                                        </div>
+                                        <div id="toHideIfSuccess">
+                                            <div class="col-md-12">
+                                                <button type="submit" id="submit<%= acronym %>" class="btn bg-default btn-block">Submit</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <p class="help-block">File format should be <%= acronym %>.xlsx</p>
+                                </div>
+                            </form>
                         </div>
                         <!-- /.box-body -->
                     </div>
-                </div>
-                <div class="col-md-8">
-                    <ul class="timeline">
-                        <!-- timeline time label -->
-                        <li class="time-label">
-                            <span class="bg-red">
-                                10 Feb. 2014
-                            </span>
-                        </li>
-                        <!-- /.timeline-label -->
-                        <!-- timeline item -->
-                        <li>
-                        <i class="fa fa-envelope bg-blue"></i>
-
-                        <div class="timeline-item">
-                            <span class="time"><i class="fa fa-clock-o"></i> 12:05</span>
-
-                            <h3 class="timeline-header"><a href="#">Support Team</a> sent you an email</h3>
-
-                            <div class="timeline-body">
-                            Etsy doostang zoodles disqus groupon greplin oooj voxy zoodles,
-                            weebly ning heekya handango imeem plugg dopplr jibjab, movity
-                            jajah plickers sifteo edmodo ifttt zimbra. Babblely odeo kaboodle
-                            quora plaxo ideeli hulu weebly balihoo...
-                            </div>
-                            <div class="timeline-footer">
-                            <a class="btn btn-primary btn-xs">Read more</a>
-                            <a class="btn btn-danger btn-xs">Delete</a>
-                            </div>
-                        </div>
-                        </li>
-                        <!-- END timeline item -->
-                        <!-- timeline item -->
-                        <li>
-                        <i class="fa fa-user bg-aqua"></i>
-
-                        <div class="timeline-item">
-                            <span class="time"><i class="fa fa-clock-o"></i> 5 mins ago</span>
-
-                            <h3 class="timeline-header no-border"><a href="#">Sarah Young</a> accepted your friend request</h3>
-                        </div>
-                        </li>
-                        <!-- END timeline item -->
-                        <!-- timeline item -->
-                        <li>
-                        <i class="fa fa-comments bg-yellow"></i>
-
-                        <div class="timeline-item">
-                            <span class="time"><i class="fa fa-clock-o"></i> 27 mins ago</span>
-
-                            <h3 class="timeline-header"><a href="#">Jay White</a> commented on your post</h3>
-
-                            <div class="timeline-body">
-                            Take me to your leader!
-                            Switzerland is small and neutral!
-                            We are more like Germany, ambitious and misunderstood!
-                            </div>
-                            <div class="timeline-footer">
-                            <a class="btn btn-warning btn-flat btn-xs">View comment</a>
-                            </div>
-                        </div>
-                        </li>
-                        <!-- END timeline item -->
-                        <!-- timeline time label -->
-                        <li class="time-label">
-                            <span class="bg-green">
-                                3 Jan. 2014
-                            </span>
-                        </li>
-                        <!-- /.timeline-label -->
-                        <!-- timeline item -->
-                        <li>
-                        <i class="fa fa-camera bg-purple"></i>
-
-                        <div class="timeline-item">
-                            <span class="time"><i class="fa fa-clock-o"></i> 2 days ago</span>
-
-                            <h3 class="timeline-header"><a href="#">Mina Lee</a> uploaded new photos</h3>
-
-                            <div class="timeline-body">
-                            <img src="http://placehold.it/150x100" alt="..." class="margin">
-                            <img src="http://placehold.it/150x100" alt="..." class="margin">
-                            <img src="http://placehold.it/150x100" alt="..." class="margin">
-                            <img src="http://placehold.it/150x100" alt="..." class="margin">
-                            </div>
-                        </div>
-                        </li>
-                        <!-- END timeline item -->
-                        <!-- timeline item -->
-                        <li>
-                        <i class="fa fa-video-camera bg-maroon"></i>
-
-                        <div class="timeline-item">
-                            <span class="time"><i class="fa fa-clock-o"></i> 5 days ago</span>
-
-                            <h3 class="timeline-header"><a href="#">Mr. Doe</a> shared a video</h3>
-
-                            <div class="timeline-body">
-                            <div class="embed-responsive embed-responsive-16by9">
-                                <iframe class="embed-responsive-item" src="https://www.youtube.com/embed/tMWkeBIohBs" frameborder="0" allowfullscreen=""></iframe>
-                            </div>
-                            </div>
-                            <div class="timeline-footer">
-                            <a href="#" class="btn btn-xs bg-maroon">See comments</a>
-                            </div>
-                        </div>
-                        </li>
-                        <!-- END timeline item -->
-                        <li>
-                        <i class="fa fa-clock-o bg-gray"></i>
-                        </li>
-                    </ul>
                 </div>
 
             </div>
@@ -500,6 +403,109 @@
 <script>
     $(function(){
         $('#perlot').DataTable();
+    });
+</script>
+
+<!-- Upload script -->
+<script>
+    window.addEventListener('load', function(){
+
+        function goUpload(){
+
+            let xhr = new XMLHttpRequest();
+            let fd = new FormData(form); // bind form data object and form element
+            
+            xhr.addEventListener('load', function(event){
+                console.log(event.target.response);
+                let resFromServer = JSON.parse(event.target.response);
+                //document.getElementById('responseDiv<%= acronym %>').style.display='block';
+                function resDiv(){
+                    let responseDiv = document.getElementById('responseDiv<%= acronym %>');
+                    
+                    if(resFromServer.err){
+                        document.getElementById('submit<%= acronym %>').removeAttribute("disabled");
+
+                        if (responseDiv.classList) { 
+                            responseDiv.classList.add("responseDivErr");
+                            responseDiv.innerHTML = resFromServer.err
+                        } else {
+                            // For IE9
+                            var classes = responseDiv.className.split(" ");
+                            var i = classes.indexOf("responseDivErr");
+
+                            if (i >= 0) {
+                                classes.splice(i, 1);
+                            } else { 
+                                classes.push("responseDivErr");
+                                responseDiv.className = classes.join(" "); 
+                                responseDiv.innerHTML = resFromServer.err
+                            }
+                        }
+
+                    } else {
+
+                        if (responseDiv.classList) { 
+                            responseDiv.classList.add("responseDivSuccess");
+                            responseDiv.innerHTML = resFromServer.auth;
+                            
+                            let hideDiv = document.getElementById('toHideIfSuccess');
+                                hideDiv.style.display = "none";
+                            
+                                
+                                setTimeout(function(){
+                                window.location.href="/uploader?format=<%= acronym %>";
+                                }, 5000);
+                                
+                               
+                        } else {
+                            // For IE9
+                            var classes = responseDiv.className.split(" ");
+                            var i = classes.indexOf("responseDivSuccess");
+
+                            if (i >= 0) {
+                                classes.splice(i, 1);
+                            } else { 
+                                classes.push("responseDivSuccess");
+                                responseDiv.className = classes.join(" "); 
+                                responseDiv.innerHTML = resFromServer.auth;
+                                
+                                let hideDiv = document.getElementById('toHideIfSuccess');
+                                    hideDiv.style.display = "none";
+
+                                
+                                setTimeout(function(){
+                                window.location.href="/uploader?format=<%= acronym %>";
+                                }, 5000);
+                                
+                            }
+                        }
+                    }
+
+                    
+                }
+
+                resDiv();
+            });
+
+            xhr.addEventListener('error', function(event){
+                alert('Something went wrong.');
+            });
+
+            xhr.open('POST', '/api/<%= acronym %>');
+            xhr.send(fd);
+
+        }
+
+        // access FORM element
+        let form = document.getElementById('upload<%= acronym %>');
+        // take over submit event
+        form.addEventListener('submit', function(event){
+            event.preventDefault();
+            document.getElementById('submit<%= acronym %>').setAttribute("disabled", "disabled");
+            goUpload();
+        });
+
+
     });
 </script>
 </body>

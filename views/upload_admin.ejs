@@ -330,27 +330,74 @@
                                         </div>
                                     </div>
                                     <div class="row">
-                                        <div id="responseDiv<%= acronym %>">
-                                            <!-- response here-->
-                                        </div>
-                                        <div id="toHideIfSuccess">
-                                            <div class="col-md-12">
-                                                <button type="submit" id="submit<%= acronym %>" class="btn bg-default btn-block">Submit</button>
+                                        <div class="col-md-12">
+                                            <div id="responseDiv<%= acronym %>">
+                                                <!-- response here-->
+                                            </div>
+                                            <div id="toHideIfSuccess">
+                                                <div class="col-md-12">
+                                                    <button type="submit" id="submit<%= acronym %>" class="btn bg-default btn-block">Submit</button>
+                                                </div>
+                                                <p class="help-block">File format should be <%= acronym %>.xlsx</p>
+                                                
                                             </div>
                                         </div>
                                     </div>
-                                    <p class="help-block">File format should be <%= acronym %>.xlsx</p>
                                 </div>
                             </form>
                         </div>
                         <!-- /.box-body -->
                     </div>
                 </div>
+                <!-- row -->
+                <div class="">
+                    <div class="col-md-8">
+                    <!-- The time line -->
+                    <ul class="timeline">
 
-            </div>
-            <!-- Cluster Groups -->
-            <div class="row">
+                        <% for(let i=0; i<timeline.length; i++)  { %>
 
+                            <% if(timeline[i].upload_date){ %>
+                                <!-- timeline time label -->
+                                <li class="time-label">
+                                    <span class="">
+                                        <%= timeline[i].upload_date %>
+                                    </span>
+                                </li>
+                                <!-- /.timeline-label -->
+        
+                                <!-- timeline item -->
+                                <li>
+                                <i class="fa fa-circle"></i>
+        
+                                <div class="timeline-item">
+                                    <span class="time"><i class="fa fa-clock-o"></i> <%= timeline[i].exact_date %></span>
+        
+                                    <p class="timeline-body"><a href="#"><%= timeline[i].excel_filename %></a> has been uploaded by username</p>
+                                    <!--
+                                    <div class="timeline-body">
+                                    </div>
+                                    <div class="timeline-footer">
+                                    </div>
+                                    -->
+                                </div>
+                                </li>
+                            <% } %>
+                            
+                        
+                        <% } %>
+
+
+                        <!-- END timeline item -->
+                        
+                        <li>
+                        <i class="fa fa-clock-o bg-gray"></i>
+                        </li>
+                    </ul>
+                    </div>
+                    <!-- /.col -->
+                </div>
+                <!-- /.row -->
             </div>
 
         </section>
@@ -405,7 +452,6 @@
         $('#perlot').DataTable();
     });
 </script>
-
 <!-- Upload script -->
 <script>
     window.addEventListener('load', function(){

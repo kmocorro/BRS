@@ -1,5 +1,6 @@
 let formidable = require('formidable');
 let XLSX = require('xlsx');
+let moment = require('moment');
 let mysql = require('../config').poolLocal;
 
 module.exports = function(app){
@@ -17,7 +18,11 @@ module.exports = function(app){
                     let label = meta_data.APL.name;
                     let acronym = meta_data.APL.acronym;
 
-                    res.render('upload_admin',{label, meta_data, acronym});
+                    return file_apl_timeline().then(function(timeline){
+                        
+                        res.render('upload_admin',{label, meta_data, acronym, timeline});
+                    });
+
                 }
             });
         } else if(req.query.format == 'SCAT'){
@@ -162,6 +167,50 @@ module.exports = function(app){
             });
         }
 
+        /** function for timelines */
+        function file_apl_timeline(){
+            return new Promise(function(resolve, reject){
+
+                mysql.getConnection(function(err, connection){
+
+                    if(err){return reject(err)};
+
+                    connection.query({
+                        sql: 'SELECT * FROM apl_logs ORDER BY id DESC LIMIT 5;'
+                    },  function(err, results){
+                        if(err){return reject(err)};
+
+                        let timeline_apl = [];
+
+                        if(typeof results[0] !== 'undefined' && results[0] !== null && results.length > 0){
+
+                            for(let i=0; i<results.length; i++){
+                                
+                                timeline_apl.push({
+                                    excel_filename: results[i].excel_filename,
+                                    excel_last_author: results[i].excel_last_author,
+                                    upload_date: moment(results[i].upload_date).calendar(),
+                                    exact_date: moment(results[i].upload_date).format('lll')
+                                });
+                            
+                            }
+
+                            resolve(timeline_apl);
+
+                        } else {
+                            resolve(timeline_apl)
+                        }
+                    });
+
+                    connection.release();
+            
+                });
+
+            });
+        }
+
+
+
     });
 
     /** POST UPLOADER ROUTES - under - /upload_admin */
@@ -185,14 +234,17 @@ module.exports = function(app){
                 
                 let workbook = XLSX.readFile(excelFile.path);
                 let APL_Worksheet = XLSX.utils.sheet_to_json(workbook.Sheets['APL'], {header: 'A'});
+                //let APL_lastauthor = XLSX.utils.sheet_to_json(workbook.Props.LastAuthor);
                 let cleaned_APL = [];
 
+                let upload_date = new Date();
+
+                //console.log(APL_lastauthor);
+
                 // cleaning workbook sheets APL.
-                for(let i=2; i<APL_Worksheet.length; i++){
+                for(let i=1; i<APL_Worksheet.length; i++){
 
                     if(APL_Worksheet[i].A){
-                        
-                        let upload_date = new Date();
 
                         cleaned_APL.push(
 
@@ -211,10 +263,10 @@ module.exports = function(app){
                     return new Promise(function(resolve, reject){
 
                         mysql.getConnection(function(err, connection){
-                            if(err){ return reject(err) };
+                            if(err){ return reject('Connection error') };
 
                             connection.query({
-                                sql: 'INSERT INTO apl_data (pn, description, items_status_code, upload_date ) VALUES ?',
+                                sql: 'INSERT INTO apl_data (pn, description, items_status_code, upload_date) VALUES ?',
                                 values: [cleaned_APL]
                             },  function(err, results){
                                 if(err){ return reject(err) };
@@ -222,7 +274,6 @@ module.exports = function(app){
                                 resolve(results.insertID);
                             });
 
-                            
                         connection.release();
                             
                         });     
@@ -232,15 +283,51 @@ module.exports = function(app){
                 }
 
                 insertToAPL().then(function(){
-                    res.send({auth:'<span class="fa fa-check"></span> Successfully uploaded'});
+
+                    function insertToAPL_logs(){
+                        return new Promise(function(resolve, reject){
+
+                            let apl_logs = []
+
+                            apl_logs.push(
+                                [excelFile.name, '', upload_date]
+                            )
+
+                            mysql.getConnection(function(err, connection){
+                                if(err){return reject(err)};
+
+                                connection.query({
+                                    sql: 'INSERT INTO apl_logs (excel_filename, excel_last_author, upload_date) VALUES ?',
+                                    values:[apl_logs]
+                                },  function(err, results){
+                                    if(err){return reject(err)};
+                                    
+                                    resolve();
+                                });
+
+                                connection.release();
+
+                            });
+                                
+                        });
+                    }
+
+                    insertToAPL_logs().then(function(){
+
+                        res.send({auth:'<span class="fa fa-check" style="color: green;"></span> Successfully uploaded'});
+                    },  function(err){
+                        console.log(err);
+                        res.send({err: '<span class="fa fa-times" style="color: red;"></span> Invalid format'});
+                    });
+
                 },  function(err){
-                    res.send({err: '<span class="fa fa-times"></span> Invalid format'});
+                    //console.log(err);
+                    res.send({err: '<span class="fa fa-times" style="color: red;"></span> Invalid format'});
                 });
 
             }
 
         });
-
 
     });
 

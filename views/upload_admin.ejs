@@ -227,14 +227,47 @@
                 </span>
             </a>
             <ul class="treeview-menu">
+                <% if(label == meta_data.APL.name) { %>
+                <li class="active"><a href="<%= meta_data.APL.url %>"><i class="ion ion-ios-checkmark-outline" style="color:green;"></i> <%= meta_data.APL.name %> </a></li>
+                <% } else {  %>
                 <li><a href="<%= meta_data.APL.url %>"><i class="ion ion-ios-checkmark-outline" style="color:green;"></i> <%= meta_data.APL.name %> </a></li>
+                <% } %>
+                
+                <% if(label == meta_data.SCAT.name) { %>
+                <li class="active"><a href="<%= meta_data.SCAT.url %>"><i class="ion ion-ios-checkmark-outline" style="color:green;"></i> <%= meta_data.SCAT.name %> </a></li>
+                <% } else { %>
                 <li><a href="<%= meta_data.SCAT.url %>"><i class="ion ion-ios-checkmark-outline" style="color:green;"></i> <%= meta_data.SCAT.name %> </a></li>
+                <% } %>
+                
+                <% if(label == meta_data.OH.name) { %>
+                <li class="active"><a href="<%= meta_data.OH.url %>"><i class="ion ion-ios-checkmark-outline" style="color:green;"></i> <%= meta_data.OH.name %> </a></li>
+                <% } else { %>
                 <li><a href="<%= meta_data.OH.url %>"><i class="ion ion-ios-checkmark-outline" style="color:green;"></i> <%= meta_data.OH.name %> </a></li>
+                <% } %>
+
+                <% if(label == meta_data.PO.name) { %>
+                <li class="active"><a href="<%= meta_data.PO.url %>"><i class="ion ion-ios-checkmark-outline" style="color:green;"></i> <%= meta_data.PO.name %> </a></li>
+                <% } else { %>
                 <li><a href="<%= meta_data.PO.url %>"><i class="ion ion-ios-checkmark-outline" style="color:green;"></i> <%= meta_data.PO.name %> </a></li>
-                <li><a href="<%= meta_data.SCAT.url %>"><i class="ion ion-ios-checkmark-outline" style="color:green;"></i> <%= meta_data.SCOST.name %> </a></li>
+                <% } %>
+
+                <% if(label == meta_data.SCOST.name) { %>
+                <li class="active"><a href="<%= meta_data.SCOST.url %>"><i class="ion ion-ios-checkmark-outline" style="color:green;"></i> <%= meta_data.SCOST.name %> </a></li>
+                <% } else { %>
+                <li><a href="<%= meta_data.SCOST.url %>"><i class="ion ion-ios-checkmark-outline" style="color:green;"></i> <%= meta_data.SCOST.name %> </a></li>
+                <% } %>
+
+                <% if(label == meta_data.SLLT.name) { %>
+                <li class="active"><a href="<%= meta_data.SLLT.url %>"><i class="ion ion-ios-checkmark-outline" style="color:green;"></i> <%= meta_data.SLLT.name %> </a></li>
+                <% } else { %>
                 <li><a href="<%= meta_data.SLLT.url %>"><i class="ion ion-ios-checkmark-outline" style="color:green;"></i> <%= meta_data.SLLT.name %> </a></li>
-                <li><a href="<%= meta_data.POS.url %>"><i class="ion ion-ios-checkmark-outline" style="color:green;"></i> <%= meta_data.POS.name %> </a></li>
+                <% } %>
+                
+                <% if(label == meta_data.POR.name) { %>
+                <li class="active"><a href="<%= meta_data.POR.url %>"><i class="ion ion-ios-checkmark-outline" style="color:green;"></i> <%= meta_data.POR.name %> </a></li>
+                <% } else { %>
                 <li><a href="<%= meta_data.POR.url %>"><i class="ion ion-ios-checkmark-outline" style="color:green;"></i> <%= meta_data.POR.name %> </a></li>
+                <% } %>
             </ul>
             </li>
             <!--
@@ -303,7 +336,7 @@
         <!-- Main content -->
         <section class="content-header">
             <h1>
-                BRS Uploader
+                <%= label %> Uploader
                 <small></small>
             </h1>
             <ol class="breadcrumb">
@@ -314,10 +347,10 @@
         <section class="content">
             <div class="row">
                 <div class="col-md-4">
-                    <div class="box box-danger">
+                    <div class="box box-default">
                         <div class="box-header with-border">
 
-                        <h3 class="box-title">Data Form</h3>
+                        <h3 class="box-title">Dada Form</h3>
                         </div>
                         <!-- /.box-header -->
                         <div class="box-body">
@@ -354,26 +387,25 @@
                     <div class="col-md-8">
                     <!-- The time line -->
                     <ul class="timeline">
+                    <!-- timeline time label -->
+                    <li class="time-label">
+                        <span class="">
+                            <%= current_date %>
+                        </span>
+                    </li>
+                    <!-- /.timeline-label -->
 
                         <% for(let i=0; i<timeline.length; i++)  { %>
-
                             <% if(timeline[i].upload_date){ %>
-                                <!-- timeline time label -->
-                                <li class="time-label">
-                                    <span class="">
-                                        <%= timeline[i].upload_date %>
-                                    </span>
-                                </li>
-                                <!-- /.timeline-label -->
-        
+                                
                                 <!-- timeline item -->
                                 <li>
-                                <i class="fa fa-circle"></i>
+                                <i class="fa fa-circle" style="width: 20px; height: 20px; left: 23px; top: 6.25px; line-height: 20px; font-size: 12px"></i>
         
                                 <div class="timeline-item">
                                     <span class="time"><i class="fa fa-clock-o"></i> <%= timeline[i].exact_date %></span>
         
-                                    <p class="timeline-body"><a href="#"><%= timeline[i].excel_filename %></a> has been uploaded by username</p>
+                                    <p class="timeline-body" style="padding: 5px;"><a href="#"><%= timeline[i].excel_filename %></a> has been uploaded by username</p>
                                     <!--
                                     <div class="timeline-body">
                                     </div>
@@ -383,10 +415,7 @@
                                 </div>
                                 </li>
                             <% } %>
-                            
-                        
                         <% } %>
-
 
                         <!-- END timeline item -->
                         
@@ -500,7 +529,7 @@
                                 
                                 setTimeout(function(){
                                 window.location.href="/uploader?format=<%= acronym %>";
-                                }, 5000);
+                                }, 2000);
                                 
                                
                         } else {
@@ -521,7 +550,7 @@
                                 
                                 setTimeout(function(){
                                 window.location.href="/uploader?format=<%= acronym %>";
-                                }, 5000);
+                                }, 2000);
                                 
                             }
                         }

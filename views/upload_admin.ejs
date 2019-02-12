@@ -402,8 +402,9 @@
                     <ul class="timeline">
                     <!-- timeline time label -->
                     <li class="time-label">
-                        <span class="">
-                            <%= current_date %>
+                        <span class="bg-    ">
+                            <!--<%= current_date %>-->
+                            Upload timeline
                         </span>
                     </li>
                     <!-- /.timeline-label -->
@@ -416,7 +417,7 @@
                                 <i class="fa fa-circle" style="width: 20px; height: 20px; left: 23px; top: 6.25px; line-height: 20px; font-size: 12px"></i>
         
                                 <div class="timeline-item">
-                                    <span class="time"><i class="fa fa-clock-o"></i> <%= timeline[i].exact_date %></span>
+                                    <span class="time"  style="padding: 5px;"> <%= timeline[i].exact_date %></span>
         
                                     <p class="timeline-body" style="padding: 5px;"><a href="#"><%= timeline[i].excel_filename %></a> has been uploaded by username</p>
                                     <!--

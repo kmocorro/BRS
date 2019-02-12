@@ -268,29 +268,71 @@ module.exports = function(app){
                     if(err){return reject(err)};
 
                     connection.query({
-                        sql: 'SELECT pn, supplier, po, po_qty, po_del, po_in_transit, po_bal, promised_dt, auth_status, upload_date FROM po_data WHERE upload_date = (SELECT MAX(upload_date) FROM po_data) AND auth_status != "NULL" AND pn IN (?)',
+                        sql: 'SELECT pn, supplier, po, po_qty, po_del, po_in_transit, po_bal, promised_dt, auth_status, upload_date FROM po_data WHERE upload_date = (SELECT MAX(upload_date) FROM po_data) AND auth_status != "NULL" AND po IN (?); ',
                         values: [uniq_pn_array()]
                     },  function(err, results){
                         if(err){return reject(err)};
 
                         let query_result = [];
 
-                        for(let i=0; i<results.length; i++){
-                            query_result.push({
-                                pn : results[i].pn,
-                                supplier: results[i].supplier,
-                                po: results[i].po,
-                                po_qty: results[i].po_qty,
-                                po_del: results[i].po_del,
-                                po_in_transit: results[i].po_in_transit,
-                                po_bal: results[i].po_bal,
-                                promised_dt: moment(results[i].promised_dt).format('llll'),
-                                auth_status: results[i].auth_status,
-                                upload_date: moment(results[i].upload_date).format('llll')
+                        // PN nga ang sinesearch kasi may results
+                        if(typeof results !== 'undefined' && results !== null && results.length > 0){
+
+                            for(let i=0; i<results.length; i++){
+                                query_result.push({
+                                    pn : results[i].pn,
+                                    supplier: results[i].supplier,
+                                    po: results[i].po,
+                                    po_qty: results[i].po_qty,
+                                    po_del: results[i].po_del,
+                                    po_in_transit: results[i].po_in_transit,
+                                    po_bal: results[i].po_bal,
+                                    promised_dt: moment(results[i].promised_dt).format('llll'),
+                                    auth_status: results[i].auth_status,
+                                    upload_date: moment(results[i].upload_date).format('llll')
+                                });
+                            }
+    
+                            resolve(query_result);
+
+                        } else {
+
+                            connection.query({
+                                sql: 'SELECT pn, supplier, po, po_qty, po_del, po_in_transit, po_bal, promised_dt, auth_status, upload_date FROM po_data WHERE upload_date = (SELECT MAX(upload_date) FROM po_data) AND auth_status != "NULL" AND pn IN (?); ',
+                                values: [uniq_pn_array()]
+                            },  function(err, results){
+                                if(err){return reject(err)};
+        
+                                if(typeof results !== 'undefined' && results !== null && results.length > 0){
+        
+                                    for(let i=0; i<results.length; i++){
+                                        query_result.push({
+                                            pn : results[i].pn,
+                                            supplier: results[i].supplier,
+                                            po: results[i].po,
+                                            po_qty: results[i].po_qty,
+                                            po_del: results[i].po_del,
+                                            po_in_transit: results[i].po_in_transit,
+                                            po_bal: results[i].po_bal,
+                                            promised_dt: moment(results[i].promised_dt).format('llll'),
+                                            auth_status: results[i].auth_status,
+                                            upload_date: moment(results[i].upload_date).format('llll')
+                                        });
+                                    }
+            
+                                    resolve(query_result);
+                                } else {
+        
+        
+                                }
+        
+                                
+        
                             });
+
                         }
 
-                        resolve(query_result);
+                        
 
                     });
 

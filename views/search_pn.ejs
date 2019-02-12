@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Upload <%= label %> | BRS</title>
+    <title>Search| BRS</title>
     <!-- Tell the browser to be responsive to screen width -->
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
     <!-- Bootstrap 3.3.7 -->
@@ -219,7 +219,7 @@
                 <i class="fa fa-home"></i> <span>Home</span>
             </a>
             </li>
-            <li class="treeview">
+            <li class="treeview active">
                 <a href="#">
                     <i class="fa fa-search"></i> <span>Search</span>
                     <span class="pull-right-container">
@@ -227,61 +227,41 @@
                     </span>
                 </a>
                 <ul class="treeview-menu">
+                    <% if(type == search_metadata.item_attributes.type) { %>
+                    <li class="active"><a href="<%= search_metadata.item_attributes.url %>"><i class="ion ion-ios-checkmark-outline" style="color:green;"></i> <%= search_metadata.item_attributes.name %> </a></li>
+                    <% } else {  %>
                     <li><a href="<%= search_metadata.item_attributes.url %>"><i class="ion ion-ios-checkmark-outline" style="color:green;"></i> <%= search_metadata.item_attributes.name %> </a></li>
+                    <% } %>
+                    
+                    <% if(type == search_metadata.po_status.type) { %>
+                    <li class="active"><a href="<%= search_metadata.po_status.url %>"><i class="ion ion-ios-checkmark-outline" style="color:green;"></i> <%= search_metadata.po_status.name %> </a></li>
+                    <% } else { %>
                     <li><a href="<%= search_metadata.po_status.url %>"><i class="ion ion-ios-checkmark-outline" style="color:green;"></i> <%= search_metadata.po_status.name %> </a></li>
+                    <% } %>
+                    
+                    <% if(type == search_metadata.on_hand.type) { %>
+                    <li class="active"><a href="<%= search_metadata.on_hand.url %>"><i class="ion ion-ios-checkmark-outline" style="color:green;"></i> <%= search_metadata.on_hand.name %> </a></li>
+                    <% } else { %>
                     <li><a href="<%= search_metadata.on_hand.url %>"><i class="ion ion-ios-checkmark-outline" style="color:green;"></i> <%= search_metadata.on_hand.name %> </a></li>
+                    <% } %>
                 </ul>
             </li>
-            <li class="treeview active">
-            <a href="#">
-                <i class="fa fa-upload"></i> <span>Upload</span>
-                <span class="pull-right-container">
-                <i class="fa fa-angle-left pull-right"></i>
-                </span>
-            </a>
-            <ul class="treeview-menu">
-                <% if(label == meta_data.APL.name) { %>
-                <li class="active"><a href="<%= meta_data.APL.url %>"><i class="ion ion-ios-checkmark-outline" style="color:green;"></i> <%= meta_data.APL.name %> </a></li>
-                <% } else {  %>
-                <li><a href="<%= meta_data.APL.url %>"><i class="ion ion-ios-checkmark-outline" style="color:green;"></i> <%= meta_data.APL.name %> </a></li>
-                <% } %>
-                
-                <% if(label == meta_data.SCAT.name) { %>
-                <li class="active"><a href="<%= meta_data.SCAT.url %>"><i class="ion ion-ios-checkmark-outline" style="color:green;"></i> <%= meta_data.SCAT.name %> </a></li>
-                <% } else { %>
-                <li><a href="<%= meta_data.SCAT.url %>"><i class="ion ion-ios-checkmark-outline" style="color:green;"></i> <%= meta_data.SCAT.name %> </a></li>
-                <% } %>
-                
-                <% if(label == meta_data.OH.name) { %>
-                <li class="active"><a href="<%= meta_data.OH.url %>"><i class="ion ion-ios-checkmark-outline" style="color:green;"></i> <%= meta_data.OH.name %> </a></li>
-                <% } else { %>
-                <li><a href="<%= meta_data.OH.url %>"><i class="ion ion-ios-checkmark-outline" style="color:green;"></i> <%= meta_data.OH.name %> </a></li>
-                <% } %>
-
-                <% if(label == meta_data.PO.name) { %>
-                <li class="active"><a href="<%= meta_data.PO.url %>"><i class="ion ion-ios-checkmark-outline" style="color:green;"></i> <%= meta_data.PO.name %> </a></li>
-                <% } else { %>
-                <li><a href="<%= meta_data.PO.url %>"><i class="ion ion-ios-checkmark-outline" style="color:green;"></i> <%= meta_data.PO.name %> </a></li>
-                <% } %>
-
-                <% if(label == meta_data.SCOST.name) { %>
-                <li class="active"><a href="<%= meta_data.SCOST.url %>"><i class="ion ion-ios-checkmark-outline" style="color:green;"></i> <%= meta_data.SCOST.name %> </a></li>
-                <% } else { %>
-                <li><a href="<%= meta_data.SCOST.url %>"><i class="ion ion-ios-checkmark-outline" style="color:green;"></i> <%= meta_data.SCOST.name %> </a></li>
-                <% } %>
-
-                <% if(label == meta_data.SLLT.name) { %>
-                <li class="active"><a href="<%= meta_data.SLLT.url %>"><i class="ion ion-ios-checkmark-outline" style="color:green;"></i> <%= meta_data.SLLT.name %> </a></li>
-                <% } else { %>
-                <li><a href="<%= meta_data.SLLT.url %>"><i class="ion ion-ios-checkmark-outline" style="color:green;"></i> <%= meta_data.SLLT.name %> </a></li>
-                <% } %>
-                
-                <% if(label == meta_data.POR.name) { %>
-                <li class="active"><a href="<%= meta_data.POR.url %>"><i class="ion ion-ios-checkmark-outline" style="color:green;"></i> <%= meta_data.POR.name %> </a></li>
-                <% } else { %>
-                <li><a href="<%= meta_data.POR.url %>"><i class="ion ion-ios-checkmark-outline" style="color:green;"></i> <%= meta_data.POR.name %> </a></li>
-                <% } %>
-            </ul>
+            <li class="treeview">
+                <a href="#">
+                    <i class="fa fa-upload"></i> <span>Upload</span>
+                    <span class="pull-right-container">
+                    <i class="fa fa-angle-left pull-right"></i>
+                    </span>
+                </a>
+                <ul class="treeview-menu">
+                    <li><a href="<%= file_metadata.APL.url %>"><i class="ion ion-ios-checkmark-outline" style="color:green;"></i> <%= file_metadata.APL.name %> </a></li>
+                    <li><a href="<%= file_metadata.SCAT.url %>"><i class="ion ion-ios-checkmark-outline" style="color:green;"></i> <%= file_metadata.SCAT.name %> </a></li>
+                    <li><a href="<%= file_metadata.OH.url %>"><i class="ion ion-ios-checkmark-outline" style="color:green;"></i> <%= file_metadata.OH.name %> </a></li>
+                    <li><a href="<%= file_metadata.PO.url %>"><i class="ion ion-ios-checkmark-outline" style="color:green;"></i> <%= file_metadata.PO.name %> </a></li>
+                    <li><a href="<%= file_metadata.SCOST.url %>"><i class="ion ion-ios-checkmark-outline" style="color:green;"></i> <%= file_metadata.SCOST.name %> </a></li>
+                    <li><a href="<%= file_metadata.SLLT.url %>"><i class="ion ion-ios-checkmark-outline" style="color:green;"></i> <%= file_metadata.SLLT.name %> </a></li>
+                    <li><a href="<%= file_metadata.POR.url %>"><i class="ion ion-ios-checkmark-outline" style="color:green;"></i> <%= file_metadata.POR.name %> </a></li>
+                </ul>
             </li>
             <!--
             <li class="treeview">
@@ -349,99 +329,114 @@
         <!-- Main content -->
         <section class="content-header">
             <h1>
-                <%= label %> Uploader
+                Search <%= label %>
                 <small></small>
             </h1>
             <ol class="breadcrumb">
                 <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
-                <li class="active">Uploader</li>
+                <li class="active">Search</li>
             </ol>
         </section>
         <section class="content">
+            <div class="row" style="margin-bottom: 12px;">
+                <div class="col-md-12">
+                    <form id="search<%= type %>" method="GET">
+                        <div class="input-group">
+                            <input hidden name="type" value="<%= type %>"/>
+                            <% if(query_from_client) { %>
+                                <input class="form-control input-lg" type="text" name="q" autofocus placeholder="Use space for multiple part numbers..." value="<%= query_from_client %>">
+                            <% } else {  %>
+                                <input class="form-control input-lg" type="text" name="q" autofocus placeholder="Use space for multiple part numbers...">
+                            <% } %>
+                            <span class="input-group-btn">
+                                <button type="submit" id="search_<%= type %>" class="btn btn-flat btn-lg"><i class="fa fa-search"></i>
+                                </button>
+                            </span>
+                        </div>
+                    </form>
+                </div>
+            </div>
             <div class="row">
-                <div class="col-md-4">
-                    <div class="box box-default">
-                        <div class="box-header with-border">
-
-                        <h3 class="box-title">Data Form</h3>
+                <div class="col-md-12">
+                    <div class="box">
+                        <div class="box-header">
+                        <h3 class="box-title"><%= query_results.length %> results found</h3>
                         </div>
                         <!-- /.box-header -->
                         <div class="box-body">
-                            <form id="upload<%= acronym %>">
-                                <div class="form-group">
-                                    <div class="row">
-                                        <div class="col-md-12" style="margin-bottom: 10px;">
-                                            <label for="uploader_form"><%= label %></label>
-                                            <input type="file" id="upload_form" name="upload_form" required>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-md-12">
-                                            <div id="responseDiv<%= acronym %>">
-                                                <!-- response here-->
-                                            </div>
-                                            <div id="toHideIfSuccess">
-                                                <div class="col-md-12">
-                                                    <button type="submit" id="submit<%= acronym %>" class="btn bg-default btn-block">Submit</button>
-                                                </div>
-                                                <p class="help-block">File format should be <%= acronym %>.xlsx</p>
-                                                
-                                            </div>
-                                        </div>
-                                    </div>
+                        <div id="example1_wrapper" class="dataTables_wrapper form-inline dt-bootstrap">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <table id="example1" class="table table-bordered table-striped dataTable" role="grid" aria-describedby="example1_info">
+                                        <thead>
+                                        <tr role="row">
+                                            <% if(table_headers) { %>
+                                                <% for(let i=0; i<table_headers.length; i++) { %>
+                                                    <th><%= table_headers[i] %>
+                                                    </th>
+                                                <% } %>
+                                            <% } %>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                            <% if(type == 'item-attributes') { %>
+                                                <% if(query_results) { %>
+                                                    <% for(let i=0; i<query_results.length; i++) { %>
+                                                        <tr role="row">
+                                                            <td><%= query_results[i].pn %></td>
+                                                            <td><%= query_results[i].description %></td>
+                                                            <td><%= query_results[i].items_status_code %></td>
+                                                            <td><%= query_results[i].category %></td>
+                                                            <td><%= query_results[i].std_cost %></td>
+                                                            <td><%= query_results[i].pre_lt %></td>
+                                                            <td><%= query_results[i].lt %></td>
+                                                            <td><%= query_results[i].post_lt %></td>
+                                                            <td><%= query_results[i].sllt_supplier %></td>
+                                                            <td><%= query_results[i].upload_date %></td>
+                                                        </tr>
+                                                    <% } %>
+                                                <% } %>
+                                            <% } else if (type == 'po-status') { %>
+                                                <% if(query_results) { %>
+                                                    <% for(let i=0; i<query_results.length; i++) { %>
+                                                        <tr role="row">
+                                                            <td><%= query_results[i].pn %></td>
+                                                            <td><%= query_results[i].supplier %></td>
+                                                            <td><%= query_results[i].po %></td>
+                                                            <td><%= query_results[i].po_qty %></td>
+                                                            <td><%= query_results[i].po_del %></td>
+                                                            <td><%= query_results[i].po_in_transit %></td>
+                                                            <td><%= query_results[i].po_bal %></td>
+                                                            <td><%= query_results[i].promised_dt %></td>
+                                                            <td><%= query_results[i].auth_status %></td>
+                                                            <td><%= query_results[i].upload_date %></td>
+                                                        </tr>
+                                                    <% } %>
+                                                <% } %>
+                                            <% } else if (type == 'on-hand') { %>
+                                                <% if(query_results) { %>
+                                                    <% for(let i=0; i<query_results.length; i++) { %>
+                                                        <tr role="row">
+                                                            <td><%= query_results[i].org_code %></td>
+                                                            <td><%= query_results[i].pn %></td>
+                                                            <td><%= query_results[i].subinv %></td>
+                                                            <td><%= query_results[i].locator %></td>
+                                                            <td><%= query_results[i].uom %></td>
+                                                            <td><%= query_results[i].qty %></td>
+                                                            <td><%= query_results[i].upload_date %></td>
+                                                        </tr>
+                                                    <% } %>
+                                                <% } %>
+                                            <% } %>
+                                        </tbody>
+                                    </table>
                                 </div>
-                            </form>
+                            </div>
                         </div>
                         <!-- /.box-body -->
                     </div>
                 </div>
-                <!-- row -->
-                <div class="">
-                    <div class="col-md-8">
-                    <!-- The time line -->
-                    <ul class="timeline">
-                    <!-- timeline time label -->
-                    <li class="time-label">
-                        <span class="">
-                            <%= current_date %>
-                        </span>
-                    </li>
-                    <!-- /.timeline-label -->
-
-                        <% for(let i=0; i<timeline.length; i++)  { %>
-                            <% if(timeline[i].upload_date){ %>
-                                
-                                <!-- timeline item -->
-                                <li>
-                                <i class="fa fa-circle" style="width: 20px; height: 20px; left: 23px; top: 6.25px; line-height: 20px; font-size: 12px"></i>
-        
-                                <div class="timeline-item">
-                                    <span class="time"><i class="fa fa-clock-o"></i> <%= timeline[i].exact_date %></span>
-        
-                                    <p class="timeline-body" style="padding: 5px;"><a href="#"><%= timeline[i].excel_filename %></a> has been uploaded by username</p>
-                                    <!--
-                                    <div class="timeline-body">
-                                    </div>
-                                    <div class="timeline-footer">
-                                    </div>
-                                    -->
-                                </div>
-                                </li>
-                            <% } %>
-                        <% } %>
-
-                        <!-- END timeline item -->
-                        
-                        <li>
-                        <i class="fa fa-clock-o bg-gray"></i>
-                        </li>
-                    </ul>
-                    </div>
-                    <!-- /.col -->
-                </div>
-                <!-- /.row -->
             </div>
-
         </section>
         <!-- /.content -->
     </div>
@@ -494,7 +489,7 @@
         $('#perlot').DataTable();
     });
 </script>
-<!-- Upload script -->
+<!-- search script -->
 <script>
     window.addEventListener('load', function(){
 
@@ -506,12 +501,12 @@
             xhr.addEventListener('load', function(event){
                 console.log(event.target.response);
                 let resFromServer = JSON.parse(event.target.response);
-                //document.getElementById('responseDiv<%= acronym %>').style.display='block';
+                //document.getElementById('responseDiv').style.display='block';
                 function resDiv(){
-                    let responseDiv = document.getElementById('responseDiv<%= acronym %>');
+                    let responseDiv = document.getElementById('responseDiv');
                     
                     if(resFromServer.err){
-                        document.getElementById('submit<%= acronym %>').removeAttribute("disabled");
+                        document.getElementById('submit').removeAttribute("disabled");
 
                         if (responseDiv.classList) { 
                             responseDiv.classList.add("responseDivErr");
@@ -541,7 +536,7 @@
                             
                                 
                                 setTimeout(function(){
-                                window.location.href="/uploader?format=<%= acronym %>";
+                                window.location.href="/uploader?format=";
                                 }, 2000);
                                 
                                
@@ -562,7 +557,7 @@
 
                                 
                                 setTimeout(function(){
-                                window.location.href="/uploader?format=<%= acronym %>";
+                                window.location.href="/uploader?format=";
                                 }, 2000);
                                 
                             }
@@ -579,17 +574,17 @@
                 alert('Something went wrong.');
             });
 
-            xhr.open('POST', '/api/<%= acronym %>');
+            xhr.open('POST', '/api/');
             xhr.send(fd);
 
         }
 
         // access FORM element
-        let form = document.getElementById('upload<%= acronym %>');
+        let form = document.getElementById('upload');
         // take over submit event
         form.addEventListener('submit', function(event){
             event.preventDefault();
-            document.getElementById('submit<%= acronym %>').setAttribute("disabled", "disabled");
+            document.getElementById('submit').setAttribute("disabled", "disabled");
             goUpload();
         });
 

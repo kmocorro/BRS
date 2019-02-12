@@ -5,7 +5,344 @@ let mysql = require('../config').poolLocal;
 
 module.exports = function(app){
 
+    /** Metadata for files to be uploaded */
+    function file_metadata(){
+        return new Promise(function(resolve, reject){
+
+            let meta_data = {
+
+                APL: {
+                    name: 'Active Parts List',
+                    nickname: 'F38',
+                    acronym: 'APL',
+                    filename: 'APL',
+                    url: '/uploader?format=APL'
+                },
+
+                SCAT: {
+                    name: 'Spares Category',
+                    nickname: 'Category',
+                    acronym: 'SCAT',
+                    filename: 'SCAT',
+                    url: '/uploader?format=SCAT'
+                },
+
+                OH: {
+                    name: 'On-Hand',
+                    nickname: 'On-Hand',
+                    acronym: 'OH',
+                    filename: 'OH',
+                    url: '/uploader?format=OH'
+                },  
+
+                PO: {
+                    name: 'Purchase Order',
+                    nickname: 'Purchase Order',
+                    acronym: 'PO',
+                    filename: 'PO',
+                    url: '/uploader?format=PO'
+                },
+                
+                SCOST: {
+                    name: 'Standard Costs',
+                    nickname: 'Std Costs',
+                    acronym: 'SCOST',
+                    filename: 'SCOST',
+                    url: '/uploader?format=SCOST'
+                },
+
+                SLLT: {
+                    name: 'Supplier List & Lead Time',
+                    nickname: 'Supplier List and Lead Time',
+                    acronym: 'SLLT',
+                    filename: 'SLLT',
+                    url: '/uploader?format=SLLT'
+                },
+                
+                /* i forgot. wala na pala tayong pos hahahaha nag email pa ko. xd
+                POS: {
+                    name: 'Purchase Order Status',
+                    nickname: 'PO Status',
+                    acronym: 'POS',
+                    filename: 'POS',
+                    url: '/uploader?format=POS'
+                },
+                */
+                
+                POR: {
+                    name: 'Purchase Order Receipt',
+                    nickname: 'PO Receipt',
+                    acronym: 'POR',
+                    filename: 'POR',
+                    url: '/uploader?format=POR'
+                }
+                
+            }
+            
+            resolve(meta_data);
+        });
+    }
+
+    /** Metadata for search feature */
+    function search_metadata(){
+        return new Promise(function(resolve, reject){
+
+            let search_metadata = {
+
+                sidebar_list: [],
+
+                item_attributes: {
+                    type: 'item-attributes',
+                    name: 'Item attributes',
+                    description: 'APL, SCAT, SCOST, SLLT joins',
+                    table: 'apl_data, scat_data, scost_data, sllt_data joined in a view table - item_attributes',
+                    url: '/search?type=item-attributes',
+                    table_headers: ['Part Number', 'Description', 'Item Status', 'Category', 'Standard Cost ($)', 'Pre Lead time', 'Lead time', 'Post Lead time', 'Supplier', 'Upload Date']
+                },
+
+                po_status:{
+                    type: 'po-status',
+                    name: 'Purchase Order Status',
+                    description: 'PO',
+                    table: 'po_data',
+                    url: '/search?type=po-status',
+                    table_headers: ['Part Number', 'Supplier', 'PO Number', 'PO Qty', 'PO Del', 'PO in transit', 'PO Bal', 'Promised Date', 'Auth Status', 'Upload Date']
+                },
+
+                on_hand:{
+                    type: 'on-hand',
+                    name: 'On-Hand',
+                    description: 'OH',
+                    table: 'on_hand',
+                    url: '/search?type=on-hand',
+                    table_headers: ['Org code', 'Part Number', 'Sub Inventory', 'Locator', 'UOM', 'Qty', 'Upload Date']
+                }
+            }
+
+
+            resolve(search_metadata);
+
+        });
+    }
+
     app.get('/', function(req, res){
+
+    });
+    
+    app.get('/search', function(req, res){
+
+        if(req.query.type == 'item-attributes'){
+            file_metadata().then(function(file_metadata){
+                return search_metadata().then(function(search_metadata){
+                    if(req.query.type == search_metadata.item_attributes.type){
+                        let label = search_metadata.item_attributes.name;
+                        let description = search_metadata.item_attributes.description;
+                        let type = search_metadata.item_attributes.type;
+                        let url = search_metadata.item_attributes.url;
+                        let table_headers = search_metadata.item_attributes.table_headers;
+                        let query_from_client = req.query.q;
+
+                        let current_date = moment(new Date()).calendar();
+
+                        if(req.query.q){
+                            return query_item_attributes().then(function(query_results){
+
+                                res.render('search_pn',{label, description, type, url, table_headers, file_metadata, search_metadata, query_results, query_from_client, current_date});
+                            });
+                        } else {
+                            let query_results = []
+                            res.render('search_pn',{label, description, type, url, table_headers, file_metadata, search_metadata, query_results, query_from_client, current_date});
+                        }
+                    }
+                });
+            });
+        } else if(req.query.type == 'po-status'){
+            file_metadata().then(function(file_metadata){
+                return search_metadata().then(function(search_metadata){
+                    let label = search_metadata.po_status.name;
+                    let description = search_metadata.po_status.description;
+                    let type = search_metadata.po_status.type;
+                    let url = search_metadata.po_status.url;
+                    let table_headers = search_metadata.po_status.table_headers;
+                    let query_from_client = req.query.q;
+
+                    let current_date = moment(new Date()).calendar();
+
+                    if(req.query.q){
+                        return query_po_status().then(function(query_results){
+
+                            res.render('search_pn',{label, description, type, url, table_headers, file_metadata, search_metadata, query_results, query_from_client, current_date});
+                        });
+                    } else {
+                        let query_results = []
+                        res.render('search_pn',{label, description, type, url, table_headers, file_metadata, search_metadata, query_results, query_from_client, current_date});
+                    }
+                        
+                });
+            });
+        } else if(req.query.type == 'on-hand'){
+            file_metadata().then(function(file_metadata){
+                return search_metadata().then(function(search_metadata){
+                    if(req.query.type == search_metadata.on_hand.type){
+                        let label = search_metadata.on_hand.name;
+                        let description = search_metadata.on_hand.description;
+                        let type = search_metadata.on_hand.type;
+                        let url = search_metadata.on_hand.url;
+                        let table_headers = search_metadata.on_hand.table_headers;
+                        let query_from_client = req.query.q;
+    
+                        let current_date = moment(new Date()).calendar();
+    
+                        if(req.query.q){
+                            return query_on_hand().then(function(query_results){
+    
+                                res.render('search_pn',{label, description, type, url, table_headers, file_metadata, search_metadata, query_results, query_from_client, current_date});
+                            });
+                        } else {
+                            let query_results = []
+                            res.render('search_pn',{label, description, type, url, table_headers, file_metadata, search_metadata, query_results, query_from_client, current_date});
+                        }
+                    }
+                });
+            });
+        } else {
+            res.send('Invalid link');
+        }
+
+        /** item-attributes query */
+        function query_item_attributes(){
+            return new Promise(function(resolve, reject){
+                
+                let query_pn_array = (req.query.q).split(' '); // split to array
+                let uniq_pn_array = function(){ // accept only uniq pn numbers
+                    return Array.from(new Set(query_pn_array));
+                }
+
+                mysql.getConnection(function(err, connection){
+                    if(err){return reject(err)};
+
+                    connection.query({
+                        sql: 'SELECT * FROM item_attributes WHERE pn IN (?)',
+                        values: [uniq_pn_array()]
+                    },  function(err, results){
+                        if(err){return reject(err)};
+
+                        let query_result = [];
+
+                        for(let i=0; i<results.length; i++){
+                            query_result.push({
+                                pn : results[i].pn,
+                                description: results[i].description,
+                                items_status_code: results[i].items_status_code,
+                                category: results[i].category,
+                                std_cost: results[i].std_cost,
+                                pre_lt: results[i].pre_lt,
+                                lt: results[i].lt,
+                                post_lt: results[i].post_lt,
+                                sllt_supplier: results[i].sllt_supplier,
+                                upload_date: moment(results[i].upload_date).format('llll')
+                            });
+                        }
+
+                        resolve(query_result);
+
+                    });
+
+                    connection.release();
+
+                });
+
+            });
+        }
+
+        /** po-status query */
+        function query_po_status(){
+            return new Promise(function(resolve, reject){
+                
+                let query_pn_array = (req.query.q).split(' '); // split to array
+                let uniq_pn_array = function(){ // accept only uniq pn numbers
+                    return Array.from(new Set(query_pn_array));
+                }
+
+                mysql.getConnection(function(err, connection){
+                    if(err){return reject(err)};
+
+                    connection.query({
+                        sql: 'SELECT pn, supplier, po, po_qty, po_del, po_in_transit, po_bal, promised_dt, auth_status, upload_date FROM po_data WHERE upload_date = (SELECT MAX(upload_date) FROM po_data) AND auth_status != "NULL" AND pn IN (?)',
+                        values: [uniq_pn_array()]
+                    },  function(err, results){
+                        if(err){return reject(err)};
+
+                        let query_result = [];
+
+                        for(let i=0; i<results.length; i++){
+                            query_result.push({
+                                pn : results[i].pn,
+                                supplier: results[i].supplier,
+                                po: results[i].po,
+                                po_qty: results[i].po_qty,
+                                po_del: results[i].po_del,
+                                po_in_transit: results[i].po_in_transit,
+                                po_bal: results[i].po_bal,
+                                promised_dt: moment(results[i].promised_dt).format('llll'),
+                                auth_status: results[i].auth_status,
+                                upload_date: moment(results[i].upload_date).format('llll')
+                            });
+                        }
+
+                        resolve(query_result);
+
+                    });
+
+                    connection.release();
+
+                });
+
+            });
+        }
+
+        /** on-hand query */
+        function query_on_hand(){
+            return new Promise(function(resolve, reject){
+                
+                let query_pn_array = (req.query.q).split(' '); // split to array
+                let uniq_pn_array = function(){ // accept only uniq pn numbers
+                    return Array.from(new Set(query_pn_array));
+                }
+
+                mysql.getConnection(function(err, connection){
+                    if(err){return reject(err)};
+
+                    connection.query({
+                        sql: 'SELECT org_code, pn, subinv, locator, uom, qty, upload_date  FROM oh_data WHERE upload_date = (SELECT MAX(upload_date) FROM oh_data) AND pn IN (?)',
+                        values: [uniq_pn_array()]
+                    },  function(err, results){
+                        if(err){return reject(err)};
+
+                        let query_result = [];
+
+                        for(let i=0; i<results.length; i++){
+                            query_result.push({
+                                pn : results[i].pn,
+                                org_code: results[i].org_code,
+                                subinv: results[i].subinv,
+                                locator: results[i].locator,
+                                uom: results[i].uom,
+                                qty: results[i].qty,
+                                upload_date: moment(results[i].upload_date).format('llll')
+                            });
+                        }
+
+                        resolve(query_result);
+
+                    });
+
+                    connection.release();
+
+                });
+
+            });
+        }
 
     });
 
@@ -14,176 +351,106 @@ module.exports = function(app){
         /** FORMAT selection phase */
         if(req.query.format == 'APL'){
             file_metadata().then(function(meta_data){
-                if(req.query.format == meta_data.APL.acronym){
-                    let label = meta_data.APL.name;
-                    let acronym = meta_data.APL.acronym;
-                    let current_date = moment(new Date()).calendar();
+                search_metadata().then(function(search_metadata){
+                    if(req.query.format == meta_data.APL.acronym){
+                        let label = meta_data.APL.name;
+                        let acronym = meta_data.APL.acronym;
+                        let current_date = moment(new Date()).calendar();
 
-                    return file_apl_timeline().then(function(timeline){
-                        res.render('upload_admin',{label, meta_data, acronym, timeline, current_date});
-                    });
+                        return file_apl_timeline().then(function(timeline){
+                            res.render('upload_admin',{label, meta_data, acronym, timeline, search_metadata, current_date});
+                        });
 
-                }
+                    }
+                });
             });
         } else if(req.query.format == 'SCAT'){
             file_metadata().then(function(meta_data){
-                if(req.query.format == meta_data.SCAT.acronym){
-                    let label = meta_data.SCAT.name;
-                    let acronym = meta_data.SCAT.acronym;
-                    let current_date = moment(new Date()).calendar();
-                    
-                    return file_scat_timeline().then(function(timeline){
-                        res.render('upload_admin',{label, meta_data, acronym, timeline, current_date});
-                    });
-                }
+                search_metadata().then(function(search_metadata){
+
+                    if(req.query.format == meta_data.SCAT.acronym){
+                        let label = meta_data.SCAT.name;
+                        let acronym = meta_data.SCAT.acronym;
+                        let current_date = moment(new Date()).calendar();
+                        
+                        return file_scat_timeline().then(function(timeline){
+                            res.render('upload_admin',{label, meta_data, acronym, timeline, search_metadata, current_date});
+                        });
+                    }
+                });
             });
         } else if(req.query.format == 'OH'){
             file_metadata().then(function(meta_data){
-                if(req.query.format == meta_data.OH.acronym){
-                    let label = meta_data.OH.name;
-                    let acronym = meta_data.OH.acronym;
-                    let current_date = moment(new Date()).calendar();
-                    
-                    return file_oh_timeline().then(function(timeline){
-                        res.render('upload_admin',{label, meta_data, acronym, timeline, current_date});
-                    });
-                }
+                search_metadata().then(function(search_metadata){
+                    if(req.query.format == meta_data.OH.acronym){
+                        let label = meta_data.OH.name;
+                        let acronym = meta_data.OH.acronym;
+                        let current_date = moment(new Date()).calendar();
+                        
+                        return file_oh_timeline().then(function(timeline){
+                            res.render('upload_admin',{label, meta_data, acronym, timeline, search_metadata, current_date});
+                        });
+                    }
+                });
             });
         } else if(req.query.format == 'PO'){
             file_metadata().then(function(meta_data){
-                if(req.query.format == meta_data.PO.acronym){
-                    let label = meta_data.PO.name;
-                    let acronym = meta_data.PO.acronym;
-                    let current_date = moment(new Date()).calendar();
-                    
-                    return file_po_timeline().then(function(timeline){
-                        res.render('upload_admin',{label, meta_data, acronym, timeline, current_date});
-                    });
-                }
+                search_metadata().then(function(search_metadata){
+                    if(req.query.format == meta_data.PO.acronym){
+                        let label = meta_data.PO.name;
+                        let acronym = meta_data.PO.acronym;
+                        let current_date = moment(new Date()).calendar();
+                        
+                        return file_po_timeline().then(function(timeline){
+                            res.render('upload_admin',{label, meta_data, acronym, timeline, search_metadata, current_date});
+                        });
+                    }
+                });
             });
         } else if(req.query.format == 'SCOST'){
             file_metadata().then(function(meta_data){
-                if(req.query.format == meta_data.SCOST.acronym){
-                    let label = meta_data.SCOST.name;
-                    let acronym = meta_data.SCOST.acronym;
-                    let current_date = moment(new Date()).calendar();
-                    
-                    return file_scost_timeline().then(function(timeline){
-                        res.render('upload_admin',{label, meta_data, acronym, timeline, current_date});
-                    });
-                }
+                search_metadata().then(function(search_metadata){
+                    if(req.query.format == meta_data.SCOST.acronym){
+                        let label = meta_data.SCOST.name;
+                        let acronym = meta_data.SCOST.acronym;
+                        let current_date = moment(new Date()).calendar();
+                        
+                        return file_scost_timeline().then(function(timeline){
+                            res.render('upload_admin',{label, meta_data, acronym, timeline, search_metadata, current_date});
+                        });
+                    }
+                });
             });
         } else if(req.query.format == 'SLLT'){
             file_metadata().then(function(meta_data){
-                if(req.query.format == meta_data.SLLT.acronym){
-                    let label = meta_data.SLLT.name;
-                    let acronym = meta_data.SLLT.acronym;
-                    let current_date = moment(new Date()).calendar();
-                    
-                    return file_sllt_timeline().then(function(timeline){
-                        res.render('upload_admin',{label, meta_data, acronym, timeline, current_date});
-                    });
-                }
-            });
-        } /* else if(req.query.format == 'POS'){
-            file_metadata().then(function(meta_data){
-                if(req.query.format == meta_data.POS.acronym){
-                    let label = meta_data.POS.name;
-                    let acronym = meta_data.POS.acronym;
-
-                    res.render('upload_admin',{label, meta_data, acronym});
-                }
-            });
-        } */ else if(req.query.format == 'POR'){
-            file_metadata().then(function(meta_data){
-                if(req.query.format == meta_data.POR.acronym){
-                    let label = meta_data.POR.name;
-                    let acronym = meta_data.POR.acronym;
-                    let current_date = moment(new Date()).calendar();
-                    
-                    return file_por_timeline().then(function(timeline){
-                        res.render('upload_admin',{label, meta_data, acronym, timeline, current_date});
-                    });
-                }
-            });
-        }
-
-        /** META data for files to be uploaded */
-        function file_metadata(){
-            return new Promise(function(resolve, reject){
-
-                let meta_data = {
-
-                    APL: {
-                        name: 'Active Parts List',
-                        nickname: 'F38',
-                        acronym: 'APL',
-                        filename: 'APL',
-                        url: '/uploader?format=APL'
-                    },
-
-                    SCAT: {
-                        name: 'Spares Category',
-                        nickname: 'Category',
-                        acronym: 'SCAT',
-                        filename: 'SCAT',
-                        url: '/uploader?format=SCAT'
-                    },
-
-                    OH: {
-                        name: 'On-Hand',
-                        nickname: 'On-Hand',
-                        acronym: 'OH',
-                        filename: 'OH',
-                        url: '/uploader?format=OH'
-                    },  
-
-                    PO: {
-                        name: 'Purchase Order',
-                        nickname: 'Purchase Order',
-                        acronym: 'PO',
-                        filename: 'PO',
-                        url: '/uploader?format=PO'
-                    },
-                    
-                    SCOST: {
-                        name: 'Standard Costs',
-                        nickname: 'Std Costs',
-                        acronym: 'SCOST',
-                        filename: 'SCOST',
-                        url: '/uploader?format=SCOST'
-                    },
-
-                    SLLT: {
-                        name: 'Supplier List & Lead Time',
-                        nickname: 'Supplier List and Lead Time',
-                        acronym: 'SLLT',
-                        filename: 'SLLT',
-                        url: '/uploader?format=SLLT'
-                    },
-                    
-                    /* i forgot. wala na pala tayong pos hahahaha nag email pa ko. xd
-                    POS: {
-                        name: 'Purchase Order Status',
-                        nickname: 'PO Status',
-                        acronym: 'POS',
-                        filename: 'POS',
-                        url: '/uploader?format=POS'
-                    },
-                    */
-                    
-                    POR: {
-                        name: 'Purchase Order Receipt',
-                        nickname: 'PO Receipt',
-                        acronym: 'POR',
-                        filename: 'POR',
-                        url: '/uploader?format=POR'
+                search_metadata().then(function(search_metadata){
+                    if(req.query.format == meta_data.SLLT.acronym){
+                        let label = meta_data.SLLT.name;
+                        let acronym = meta_data.SLLT.acronym;
+                        let current_date = moment(new Date()).calendar();
+                        
+                        return file_sllt_timeline().then(function(timeline){
+                            res.render('upload_admin',{label, meta_data, acronym, timeline, search_metadata, current_date});
+                        });
                     }
-                    
-                }
-                
-                resolve(meta_data);
+                });
             });
+        } else if(req.query.format == 'POR'){
+            file_metadata().then(function(meta_data){
+                search_metadata().then(function(search_metadata){
+                    if(req.query.format == meta_data.POR.acronym){
+                        let label = meta_data.POR.name;
+                        let acronym = meta_data.POR.acronym;
+                        let current_date = moment(new Date()).calendar();
+                        
+                        return file_por_timeline().then(function(timeline){
+                            res.render('upload_admin',{label, meta_data, acronym, timeline, search_metadata, current_date});
+                        });
+                    }
+                });
+            });
+        } else {
+            res.send('Invalid link');
         }
 
         /** APL timeline */
@@ -525,6 +792,11 @@ module.exports = function(app){
 
     });
 
+    app.get('/search', function(req, res){
+
+
+    });
+
     /** POST UPLOADER ROUTES - under - /uploader */
     app.post('/api/APL', function(req, res){
 
@@ -843,7 +1115,7 @@ module.exports = function(app){
                             if(err){ return reject('Connection error') };
 
                             connection.query({
-                                sql: 'INSERT INTO oh_data (pn, org_code, subinv, locator, uon, qty, upload_date) VALUES ?',
+                                sql: 'INSERT INTO oh_data (pn, org_code, subinv, locator, uom, qty, upload_date) VALUES ?',
                                 values: [cleaned_OH]
                             },  function(err, results){
                                 if(err){ return reject(err) };
@@ -1248,7 +1520,7 @@ module.exports = function(app){
                             if(err){ return reject('Connection error') };
 
                             connection.query({
-                                sql: 'INSERT INTO sllt_data (pn, description, pre_lit, lt, post_lt, supplier, upload_date) VALUES ?',
+                                sql: 'INSERT INTO sllt_data (pn, description, pre_lt, lt, post_lt, supplier, upload_date) VALUES ?',
                                 values: [cleaned_SLLT]
                             },  function(err, results){
                                 if(err){ return reject(err) };

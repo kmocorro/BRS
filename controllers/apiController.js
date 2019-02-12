@@ -1,7 +1,7 @@
 let formidable = require('formidable');
 let XLSX = require('xlsx');
 let moment = require('moment');
-let mysql = require('../config').poolLocal;
+let mysql = require('../config').pool;
 
 module.exports = function(app){
 

@@ -93,7 +93,7 @@ module.exports = function(app){
 
                 item_attributes: {
                     type: 'item-attributes',
-                    name: 'Item attributes',
+                    name: 'Item Attributes',
                     description: 'APL, SCAT, SCOST, SLLT joins',
                     table: 'apl_data, scat_data, scost_data, sllt_data joined in a view table - item_attributes',
                     url: '/search?type=item-attributes',
@@ -111,7 +111,7 @@ module.exports = function(app){
 
                 on_hand:{
                     type: 'on-hand',
-                    name: 'On-Hand',
+                    name: 'On-Hand Inventory',
                     description: 'OH',
                     table: 'on_hand',
                     url: '/search?type=on-hand',

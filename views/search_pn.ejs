@@ -343,11 +343,21 @@
                     <form id="search<%= type %>" method="GET">
                         <div class="input-group">
                             <input hidden name="type" value="<%= type %>"/>
-                            <% if(query_from_client) { %>
-                                <input class="form-control input-lg" type="text" name="q" autofocus placeholder="Use space for multiple part numbers..." value="<%= query_from_client %>">
-                            <% } else {  %>
-                                <input class="form-control input-lg" type="text" name="q" autofocus placeholder="Use space for multiple part numbers...">
+                            <% if(type == 'po-status') { %> 
+                                <% if(query_from_client) { %>
+                                    <input class="form-control input-lg" type="text" name="q" autofocus placeholder="Use space for multiple PN or PO numbers..." value="<%= query_from_client %>">
+                                <% } else {  %>
+                                    <input class="form-control input-lg" type="text" name="q" autofocus placeholder="Use space for multiple PN or PO numbers...">
+                                <% } %>
+                            <% } else { %>
+                                <% if(query_from_client) { %>
+                                    <input class="form-control input-lg" type="text" name="q" autofocus placeholder="Use space for multiple PN..." value="<%= query_from_client %>">
+                                <% } else {  %>
+                                    <input class="form-control input-lg" type="text" name="q" autofocus placeholder="Use space for multiple PN...">
+                                <% } %>
                             <% } %>
+
+                            
                             <span class="input-group-btn">
                                 <button type="submit" id="search_<%= type %>" class="btn btn-flat btn-lg"><i class="fa fa-search"></i>
                                 </button>

@@ -106,7 +106,7 @@ module.exports = function(app){
                     description: 'PO',
                     table: 'po_data',
                     url: '/search?type=po-status',
-                    table_headers: ['Part Number', 'Supplier', 'PO Number', 'PO Qty', 'PO Del', 'PO in transit', 'PO Bal', 'Promised Date', 'Auth Status', 'Upload Date']
+                    table_headers: ['Part Number', 'Description', 'Supplier', 'PO Number', 'PO Qty', 'PO Del', 'PO in transit', 'PO Bal', 'Promised Date', 'Auth Status', 'Upload Date']
                 },
 
                 on_hand:{
@@ -115,7 +115,7 @@ module.exports = function(app){
                     description: 'OH',
                     table: 'on_hand',
                     url: '/search?type=on-hand',
-                    table_headers: ['Org code', 'Part Number', 'Sub Inventory', 'Locator', 'UOM', 'Qty', 'Upload Date']
+                    table_headers: ['Org code', 'Part Number', 'Description', 'Sub Inventory', 'Locator', 'UOM', 'Qty', 'Upload Date']
                 }
             }
 
@@ -268,20 +268,21 @@ module.exports = function(app){
                     if(err){return reject(err)};
 
                     connection.query({
-                        sql: 'SELECT pn, supplier, po, po_qty, po_del, po_in_transit, po_bal, promised_dt, auth_status, upload_date FROM po_data WHERE upload_date = (SELECT MAX(upload_date) FROM po_data) AND auth_status != "NULL" AND po IN (?); ',
+                        sql: 'SELECT * FROM (SELECT pn, supplier, po, po_qty, po_del, po_in_transit, po_bal, promised_dt, auth_status, upload_date FROM po_data WHERE upload_date = (SELECT MAX(upload_date) FROM po_data) AND auth_status != "NULL" AND po IN (?)) as pos JOIN (SELECT * FROM apl_data WHERE upload_date = (SELECT MAX(upload_date) FROM apl_data)) as apl ON apl.pn = pos.pn ',
                         values: [uniq_pn_array()]
                     },  function(err, results){
                         if(err){return reject(err)};
 
                         let query_result = [];
 
-                        // PN nga ang sinesearch kasi may results
+                        // PO nga ang sinesearch kasi may results
                         if(typeof results !== 'undefined' && results !== null && results.length > 0){
 
                             for(let i=0; i<results.length; i++){
                                 query_result.push({
                                     pn : results[i].pn,
                                     supplier: results[i].supplier,
+                                    description: results[i].description,
                                     po: results[i].po,
                                     po_qty: results[i].po_qty,
                                     po_del: results[i].po_del,
@@ -298,7 +299,7 @@ module.exports = function(app){
                         } else {
 
                             connection.query({
-                                sql: 'SELECT pn, supplier, po, po_qty, po_del, po_in_transit, po_bal, promised_dt, auth_status, upload_date FROM po_data WHERE upload_date = (SELECT MAX(upload_date) FROM po_data) AND auth_status != "NULL" AND pn IN (?); ',
+                                sql: 'SELECT * FROM (SELECT pn, supplier, po, po_qty, po_del, po_in_transit, po_bal, promised_dt, auth_status, upload_date FROM po_data WHERE upload_date = (SELECT MAX(upload_date) FROM po_data) AND auth_status != "NULL" AND pn IN (?)) as pos JOIN (SELECT * FROM apl_data WHERE upload_date = (SELECT MAX(upload_date) FROM apl_data)) as apl ON apl.pn = pos.pn  ',
                                 values: [uniq_pn_array()]
                             },  function(err, results){
                                 if(err){return reject(err)};
@@ -309,6 +310,7 @@ module.exports = function(app){
                                         query_result.push({
                                             pn : results[i].pn,
                                             supplier: results[i].supplier,
+                                            description: results[i].description,
                                             po: results[i].po,
                                             po_qty: results[i].po_qty,
                                             po_del: results[i].po_del,
@@ -356,7 +358,7 @@ module.exports = function(app){
                     if(err){return reject(err)};
 
                     connection.query({
-                        sql: 'SELECT org_code, pn, subinv, locator, uom, qty, upload_date  FROM oh_data WHERE upload_date = (SELECT MAX(upload_date) FROM oh_data) AND pn IN (?)',
+                        sql: 'SELECT * FROM (SELECT org_code, pn, subinv, locator, uom, qty, upload_date  FROM oh_data WHERE upload_date = (SELECT MAX(upload_date) FROM oh_data) AND pn IN (?)) as oh JOIN (SELECT * FROM apl_data WHERE upload_date = (SELECT MAX(upload_date) FROM apl_data)) as apl ON apl.pn = oh.pn ',
                         values: [uniq_pn_array()]
                     },  function(err, results){
                         if(err){return reject(err)};
@@ -367,6 +369,7 @@ module.exports = function(app){
                             query_result.push({
                                 pn : results[i].pn,
                                 org_code: results[i].org_code,
+                                description: results[i].description,
                                 subinv: results[i].subinv,
                                 locator: results[i].locator,
                                 uom: results[i].uom,

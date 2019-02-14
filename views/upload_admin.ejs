@@ -134,23 +134,23 @@
                 </ul>
             </li>
             -->
-            <!-- User Account: style can be found in dropdown.less 
+            <!-- User Account: style can be found in dropdown.less -->
             <li class="dropdown user user-menu">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                 <img src="../assets/dist/img/avatar5.png" class="user-image" alt="User Image">
-                <span class="hidden-xs">Guest</span>
+                <span class="hidden-xs"><%= user_details.givenName %></span>
                 </a>
                 <ul class="dropdown-menu">
-                <!-- User image 
+                <!-- User image -->
                 <li class="user-header">
                     <img src="../assets/dist/img/avatar5.png" class="img-circle" alt="User Image">
 
                     <p>
-                    Guest
-                    <small>Anonymous Team</small>
+                    <%= user_details.displayName %>
+                    <small><%= user_details.title %></small>
                     </p>
                 </li>
-                <!-- Menu Body 
+                <!-- Menu Body -->
                 <li class="user-body">
                     <div class="row">
                     <div class="col-xs-6 text-center">
@@ -160,9 +160,9 @@
                         <a href="#">Action Requests</a>
                     </div>
                     </div>
-                    <!-- /.row 
+                    <!-- /.row -->
                 </li>
-                <!-- Menu Footer
+                <!-- Menu Footer -->
                 <li class="user-footer">
                     <div class="pull-left">
                     <a href="#" class="btn btn-default btn-flat">Profile</a>
@@ -173,7 +173,7 @@
                 </li>
                 </ul>
             </li>
-            <!-- Control Sidebar Toggle Button
+            <!-- Control Sidebar Toggle Button 
             <li>
                 <a href="#" data-toggle="control-sidebar"><i class="fa fa-gears"></i></a>
             </li>

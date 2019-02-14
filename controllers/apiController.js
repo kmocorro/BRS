@@ -571,6 +571,22 @@ module.exports = function(app){
         res.header('Expires', '-1');
         res.header('Pragma', 'no-cache');
 
+        let authenticity_token = jwt.sign({
+            id: uuidv4(),
+            claim: {
+                signup: 'valid'
+            }
+        }, config.secret);
+
+        let user_details = {
+            username: req.claim.username,
+            displayName: req.claim.displayName,
+            givenName: req.claim.givenName,
+            title: req.claim.title,
+            department: req.claim.department,
+            isAdmin: req.claim.isAdmin
+        }
+
         /** FORMAT selection phase */
         if(req.query.format == 'APL'){
             file_metadata().then(function(meta_data){
@@ -581,7 +597,7 @@ module.exports = function(app){
                         let current_date = moment(new Date()).calendar();
 
                         return file_apl_timeline().then(function(timeline){
-                            res.render('upload_admin',{label, meta_data, acronym, timeline, search_metadata, current_date});
+                            res.render('upload_admin',{label, meta_data, acronym, timeline, search_metadata, current_date, user_details, authenticity_token});
                         });
 
                     }
@@ -597,7 +613,7 @@ module.exports = function(app){
                         let current_date = moment(new Date()).calendar();
                         
                         return file_scat_timeline().then(function(timeline){
-                            res.render('upload_admin',{label, meta_data, acronym, timeline, search_metadata, current_date});
+                            res.render('upload_admin',{label, meta_data, acronym, timeline, search_metadata, current_date, user_details, authenticity_token});
                         });
                     }
                 });
@@ -611,7 +627,7 @@ module.exports = function(app){
                         let current_date = moment(new Date()).calendar();
                         
                         return file_oh_timeline().then(function(timeline){
-                            res.render('upload_admin',{label, meta_data, acronym, timeline, search_metadata, current_date});
+                            res.render('upload_admin',{label, meta_data, acronym, timeline, search_metadata, current_date, user_details, authenticity_token});
                         });
                     }
                 });
@@ -625,7 +641,7 @@ module.exports = function(app){
                         let current_date = moment(new Date()).calendar();
                         
                         return file_po_timeline().then(function(timeline){
-                            res.render('upload_admin',{label, meta_data, acronym, timeline, search_metadata, current_date});
+                            res.render('upload_admin',{label, meta_data, acronym, timeline, search_metadata, current_date, user_details, authenticity_token});
                         });
                     }
                 });
@@ -639,7 +655,7 @@ module.exports = function(app){
                         let current_date = moment(new Date()).calendar();
                         
                         return file_scost_timeline().then(function(timeline){
-                            res.render('upload_admin',{label, meta_data, acronym, timeline, search_metadata, current_date});
+                            res.render('upload_admin',{label, meta_data, acronym, timeline, search_metadata, current_date, user_details, authenticity_token});
                         });
                     }
                 });
@@ -653,7 +669,7 @@ module.exports = function(app){
                         let current_date = moment(new Date()).calendar();
                         
                         return file_sllt_timeline().then(function(timeline){
-                            res.render('upload_admin',{label, meta_data, acronym, timeline, search_metadata, current_date});
+                            res.render('upload_admin',{label, meta_data, acronym, timeline, search_metadata, current_date, user_details, authenticity_token});
                         });
                     }
                 });
@@ -667,7 +683,7 @@ module.exports = function(app){
                         let current_date = moment(new Date()).calendar();
                         
                         return file_por_timeline().then(function(timeline){
-                            res.render('upload_admin',{label, meta_data, acronym, timeline, search_metadata, current_date});
+                            res.render('upload_admin',{label, meta_data, acronym, timeline, search_metadata, current_date, user_details, authenticity_token});
                         });
                     }
                 });

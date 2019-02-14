@@ -142,7 +142,7 @@ module.exports = function(app){
 
         res.render('login', {authenticity_token});
     });
-    
+
     app.get('/logout', function(req, res){
         res.cookie('auth', null);
         res.redirect('/');
@@ -383,8 +383,6 @@ module.exports = function(app){
             }
 
         }
-
-        
 
         /** item-attributes query */
         function query_item_attributes(){
@@ -1023,6 +1021,22 @@ module.exports = function(app){
 
         let form = new formidable.IncomingForm();
 
+        let authenticity_token = jwt.sign({
+            id: uuidv4(),
+            claim: {
+                signup: 'valid'
+            }
+        }, config.secret);
+
+        let user_details = {
+            username: req.claim.username,
+            displayName: req.claim.displayName,
+            givenName: req.claim.givenName,
+            title: req.claim.title,
+            department: req.claim.department,
+            isAdmin: req.claim.isAdmin
+        }
+
         form.maxFileSize = 2 * 1024 * 1024; // max size 2MB. we can adjust this later ;)
 
         /** parse form & file */
@@ -1095,7 +1109,7 @@ module.exports = function(app){
                             let apl_logs = []
 
                             apl_logs.push(
-                                [excelFile.name, '', upload_date]
+                                [excelFile.name, user_details.username, upload_date]
                             )
 
                             mysql.getConnection(function(err, connection){
@@ -1154,6 +1168,22 @@ module.exports = function(app){
     app.post('/api/SCAT', verifyToken, function(req, res){
         
         let form = new formidable.IncomingForm();
+
+        let authenticity_token = jwt.sign({
+            id: uuidv4(),
+            claim: {
+                signup: 'valid'
+            }
+        }, config.secret);
+
+        let user_details = {
+            username: req.claim.username,
+            displayName: req.claim.displayName,
+            givenName: req.claim.givenName,
+            title: req.claim.title,
+            department: req.claim.department,
+            isAdmin: req.claim.isAdmin
+        }
 
         form.maxFileSize = 2 * 1024 * 1024; // max size 2MB. we can adjust this later ;)
 
@@ -1226,7 +1256,7 @@ module.exports = function(app){
                             let apl_logs = []
 
                             apl_logs.push(
-                                [excelFile.name, '', upload_date]
+                                [excelFile.name, user_details.username, upload_date]
                             )
 
                             mysql.getConnection(function(err, connection){
@@ -1284,6 +1314,22 @@ module.exports = function(app){
     app.post('/api/OH', verifyToken, function(req, res){
         
         let form = new formidable.IncomingForm();
+
+        let authenticity_token = jwt.sign({
+            id: uuidv4(),
+            claim: {
+                signup: 'valid'
+            }
+        }, config.secret);
+
+        let user_details = {
+            username: req.claim.username,
+            displayName: req.claim.displayName,
+            givenName: req.claim.givenName,
+            title: req.claim.title,
+            department: req.claim.department,
+            isAdmin: req.claim.isAdmin
+        }
 
         form.maxFileSize = 2 * 1024 * 1024; // max size 2MB. we can adjust this later ;)
 
@@ -1360,7 +1406,7 @@ module.exports = function(app){
                             let apl_logs = []
 
                             apl_logs.push(
-                                [excelFile.name, '', upload_date]
+                                [excelFile.name, user_details.username, upload_date]
                             )
 
                             mysql.getConnection(function(err, connection){
@@ -1418,6 +1464,22 @@ module.exports = function(app){
     app.post('/api/PO', verifyToken, function(req, res){
         
         let form = new formidable.IncomingForm();
+
+        let authenticity_token = jwt.sign({
+            id: uuidv4(),
+            claim: {
+                signup: 'valid'
+            }
+        }, config.secret);
+
+        let user_details = {
+            username: req.claim.username,
+            displayName: req.claim.displayName,
+            givenName: req.claim.givenName,
+            title: req.claim.title,
+            department: req.claim.department,
+            isAdmin: req.claim.isAdmin
+        }
 
         form.maxFileSize = 2 * 1024 * 1024; // max size 2MB. we can adjust this later ;)
 
@@ -1503,7 +1565,7 @@ module.exports = function(app){
                             let apl_logs = []
 
                             apl_logs.push(
-                                [excelFile.name, '', upload_date]
+                                [excelFile.name, user_details.username, upload_date]
                             )
 
                             mysql.getConnection(function(err, connection){
@@ -1561,6 +1623,22 @@ module.exports = function(app){
     app.post('/api/SCOST', verifyToken, function(req, res){
         
         let form = new formidable.IncomingForm();
+
+        let authenticity_token = jwt.sign({
+            id: uuidv4(),
+            claim: {
+                signup: 'valid'
+            }
+        }, config.secret);
+
+        let user_details = {
+            username: req.claim.username,
+            displayName: req.claim.displayName,
+            givenName: req.claim.givenName,
+            title: req.claim.title,
+            department: req.claim.department,
+            isAdmin: req.claim.isAdmin
+        }
 
         /** parse form & file */
         form.parse(req, function(err, fields, file){
@@ -1633,7 +1711,7 @@ module.exports = function(app){
                             let apl_logs = []
 
                             apl_logs.push(
-                                [excelFile.name, '', upload_date]
+                                [excelFile.name, user_details.username, upload_date]
                             )
 
                             mysql.getConnection(function(err, connection){
@@ -1691,6 +1769,22 @@ module.exports = function(app){
     app.post('/api/SLLT', verifyToken, function(req, res){
         
         let form = new formidable.IncomingForm();
+
+        let authenticity_token = jwt.sign({
+            id: uuidv4(),
+            claim: {
+                signup: 'valid'
+            }
+        }, config.secret);
+
+        let user_details = {
+            username: req.claim.username,
+            displayName: req.claim.displayName,
+            givenName: req.claim.givenName,
+            title: req.claim.title,
+            department: req.claim.department,
+            isAdmin: req.claim.isAdmin
+        }
 
         /** parse form & file */
         form.parse(req, function(err, fields, file){
@@ -1765,7 +1859,7 @@ module.exports = function(app){
                             let apl_logs = []
 
                             apl_logs.push(
-                                [excelFile.name, '', upload_date]
+                                [excelFile.name, user_details.username, upload_date]
                             )
 
                             mysql.getConnection(function(err, connection){
@@ -1823,6 +1917,22 @@ module.exports = function(app){
     app.post('/api/POR', verifyToken, function(req, res){
         
         let form = new formidable.IncomingForm();
+
+        let authenticity_token = jwt.sign({
+            id: uuidv4(),
+            claim: {
+                signup: 'valid'
+            }
+        }, config.secret);
+
+        let user_details = {
+            username: req.claim.username,
+            displayName: req.claim.displayName,
+            givenName: req.claim.givenName,
+            title: req.claim.title,
+            department: req.claim.department,
+            isAdmin: req.claim.isAdmin
+        }
 
         /** parse form & file */
         form.parse(req, function(err, fields, file){
@@ -1898,7 +2008,7 @@ module.exports = function(app){
                             let apl_logs = []
 
                             apl_logs.push(
-                                [excelFile.name, '', upload_date]
+                                [excelFile.name, user_details.username, upload_date]
                             )
 
                             mysql.getConnection(function(err, connection){

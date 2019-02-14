@@ -10,7 +10,7 @@ let verifyToken = require('../controllers/verifyToken');
 
 module.exports = function(app){
 
-    /** Metadata for files to be uploaded */
+    /** metadata for files to be uploaded */
     function file_metadata(){
         return new Promise(function(resolve, reject){
 
@@ -88,7 +88,7 @@ module.exports = function(app){
         });
     }
 
-    /** Metadata for search feature */
+    /** metadata for search feature */
     function search_metadata(){
         return new Promise(function(resolve, reject){
 
@@ -102,7 +102,7 @@ module.exports = function(app){
                     description: 'APL, SCAT, SCOST, SLLT joins',
                     table: 'apl_data, scat_data, scost_data, sllt_data joined in a view table - item_attributes',
                     url: '/search?type=item-attributes',
-                    table_headers: ['Part Number', 'Description', 'Item Status', 'Category', 'Standard Cost ($)', 'Pre Lead time', 'Lead time', 'Post Lead time', 'Supplier', 'Upload Date']
+                    table_headers: ['Part Number', 'Description', 'Item Status', 'Item Sub Type', 'Arena Category', 'Tool Group', 'Category', 'Standard Cost ($)', 'Pre Lead time', 'Lead time', 'Post Lead time', 'Supplier', 'Upload Date']
                 },
 
                 po_status:{
@@ -409,6 +409,9 @@ module.exports = function(app){
                                 pn : results[i].pn,
                                 description: results[i].description,
                                 items_status_code: results[i].items_status_code,
+                                item_sub_type: results[i].item_sub_type,
+                                arena_category: results[i].arena_category,
+                                tool_group: results[i].tool_group,
                                 category: results[i].category,
                                 std_cost: results[i].std_cost,
                                 pre_lt: results[i].pre_lt,
@@ -1086,7 +1089,10 @@ module.exports = function(app){
                             [APL_Worksheet[i].A,
                             APL_Worksheet[i].B,
                             APL_Worksheet[i].C,
-                            upload_date]
+                            upload_date,
+                            APL_Worksheet[i].D,
+                            APL_Worksheet[i].E,
+                            APL_Worksheet[i].F]
     
                         );
                     }
@@ -1101,7 +1107,7 @@ module.exports = function(app){
                             if(err){ return reject('Connection error') };
 
                             connection.query({
-                                sql: 'INSERT INTO apl_data (pn, description, items_status_code, upload_date) VALUES ?',
+                                sql: 'INSERT INTO apl_data (pn, description, items_status_code, upload_date, item_sub_type, arena_category, tool_group) VALUES ?',
                                 values: [cleaned_APL]
                             },  function(err, results){
                                 if(err){ return reject(err) };

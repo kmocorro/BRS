@@ -138,7 +138,7 @@
             <li class="dropdown user user-menu">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                 <img src="../assets/dist/img/avatar5.png" class="user-image" alt="User Image">
-                <span class="hidden-xs"><%= user_details.givenName %></span>
+                <span class="hidden-xs"><%= user_details.displayName %></span>
                 </a>
                 <ul class="dropdown-menu">
                 <!-- User image -->
@@ -146,7 +146,7 @@
                     <img src="../assets/dist/img/avatar5.png" class="img-circle" alt="User Image">
 
                     <p>
-                    <%= user_details.displayName %>
+                    <%= user_details.givenName %>
                     <small><%= user_details.title %></small>
                     </p>
                 </li>
@@ -398,6 +398,9 @@
                                                             <td><%= query_results[i].pn %></td>
                                                             <td><%= query_results[i].description %></td>
                                                             <td><%= query_results[i].items_status_code %></td>
+                                                            <td><%= query_results[i].item_sub_type %></td>
+                                                            <td><%= query_results[i].arena_category %></td>
+                                                            <td><%= query_results[i].tool_group %></td>
                                                             <td><%= query_results[i].category %></td>
                                                             <td><%= query_results[i].std_cost %></td>
                                                             <td><%= query_results[i].pre_lt %></td>

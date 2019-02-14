@@ -118,12 +118,16 @@ module.exports = function(app){
 
                                     return for_admins().then(function(isAdmin){
                                         if(isAdmin){
+                                            
+                                            let nickName_array = (user.displayName).split(" ");
+                                            let nickName = nickName_array[0];
+
                                             let token = jwt.sign({
                                                 id: user.employeeID, // diff from employeeNumber
                                                 claim: {
                                                     employeeNumber: user.employeeNumber,
-                                                    displayName: user.displayName,
-                                                    givenName: user.givenName,
+                                                    displayName: nickName,
+                                                    givenName: user.displayName,
                                                     title: user.title,
                                                     department: user.department,
                                                     username: user.sAMAccountName,

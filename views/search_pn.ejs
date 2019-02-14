@@ -134,23 +134,23 @@
                 </ul>
             </li>
             -->
-            <!-- User Account: style can be found in dropdown.less 
+            <!-- User Account: style can be found in dropdown.less -->
             <li class="dropdown user user-menu">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                 <img src="../assets/dist/img/avatar5.png" class="user-image" alt="User Image">
-                <span class="hidden-xs">Guest</span>
+                <span class="hidden-xs"><%= user_details.givenName %></span>
                 </a>
                 <ul class="dropdown-menu">
-                <!-- User image 
+                <!-- User image -->
                 <li class="user-header">
                     <img src="../assets/dist/img/avatar5.png" class="img-circle" alt="User Image">
 
                     <p>
-                    Guest
-                    <small>Anonymous Team</small>
+                    <%= user_details.displayName %>
+                    <small><%= user_details.title %></small>
                     </p>
                 </li>
-                <!-- Menu Body 
+                <!-- Menu Body -->
                 <li class="user-body">
                     <div class="row">
                     <div class="col-xs-6 text-center">
@@ -160,9 +160,9 @@
                         <a href="#">Action Requests</a>
                     </div>
                     </div>
-                    <!-- /.row 
+                    <!-- /.row -->
                 </li>
-                <!-- Menu Footer
+                <!-- Menu Footer -->
                 <li class="user-footer">
                     <div class="pull-left">
                     <a href="#" class="btn btn-default btn-flat">Profile</a>
@@ -246,6 +246,7 @@
                     <% } %>
                 </ul>
             </li>
+            <% if(file_metadata) { %>
             <li class="treeview">
                 <a href="#">
                     <i class="fa fa-upload"></i> <span>Upload</span>
@@ -263,6 +264,7 @@
                     <li><a href="<%= file_metadata.POR.url %>"><i class="ion ion-ios-checkmark-outline" style="color:green;"></i> <%= file_metadata.POR.name %> </a></li>
                 </ul>
             </li>
+            <% } %>
             <!--
             <li class="treeview">
             <a href="#">
@@ -345,9 +347,9 @@
                             <input hidden name="type" value="<%= type %>"/>
                             <% if(type == 'po-status') { %> 
                                 <% if(query_from_client) { %>
-                                    <input class="form-control input-lg" type="text" name="q" autofocus placeholder="Use space for multiple PN or PO numbers..." value="<%= query_from_client %>">
+                                    <input class="form-control input-lg" type="text" name="q" autofocus placeholder="Use space for multiple PO or PN numbers..." value="<%= query_from_client %>">
                                 <% } else {  %>
-                                    <input class="form-control input-lg" type="text" name="q" autofocus placeholder="Use space for multiple PN or PO numbers...">
+                                    <input class="form-control input-lg" type="text" name="q" autofocus placeholder="Use space for multiple PO or PN numbers...">
                                 <% } %>
                             <% } else { %>
                                 <% if(query_from_client) { %>

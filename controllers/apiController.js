@@ -2,6 +2,11 @@ let formidable = require('formidable');
 let XLSX = require('xlsx');
 let moment = require('moment');
 let mysql = require('../config').pool;
+let uuidv4 = require('uuid/v4');
+let jwt = require('jsonwebtoken');
+
+let config = require('../config').authSecret;
+let verifyToken = require('../controllers/verifyToken');
 
 module.exports = function(app){
 
@@ -124,90 +129,262 @@ module.exports = function(app){
 
         });
     }
+    
+    /** routes */
+    app.get('/login', function(req, res){
 
-    app.get('/', function(req, res){
+        let authenticity_token = jwt.sign({
+            id: uuidv4(),
+            claim: {
+                signup: 'valid'
+            }
+        }, config.secret, { expiresIn: 30000 });
+
+        res.render('login', {authenticity_token});
+    });
+    
+    app.get('/logout', function(req, res){
+        res.cookie('auth', null);
+        res.redirect('/');
+    });
+
+    app.get('/', verifyToken, function(req, res){
+        res.header('Cache-Control', 'private, no-cache, no-store, must-revalidate');
+        res.header('Expires', '-1');
+        res.header('Pragma', 'no-cache');
+
+        if(req.userID && req.claim){
+
+            let authenticity_token = jwt.sign({
+                id: uuidv4(),
+                claim: {
+                    signup: 'valid'
+                }
+            }, config.secret);
+
+            let user_details = {
+                username: req.claim.username,
+                displayName: req.claim.displayName,
+                givenName: req.claim.givenName,
+                title: req.claim.title,
+                department: req.claim.department,
+                isAdmin: req.claim.isAdmin
+            }
+            
+            if(user_details.isAdmin){
+
+                file_metadata().then(function(file_metadata){
+                    return search_metadata().then(function(search_metadata){
+                        res.render('index', {file_metadata, search_metadata, authenticity_token, user_details});
+                    });
+                });
+
+            } else {
+                let file_metadata = null;
+
+                search_metadata().then(function(search_metadata){
+                    res.render('index', {file_metadata, search_metadata, authenticity_token, user_details});
+                });
+            }
+
+        }
 
     });
     
-    app.get('/search', function(req, res){
+    app.get('/search', verifyToken, function(req, res){
+        res.header('Cache-Control', 'private, no-cache, no-store, must-revalidate');
+        res.header('Expires', '-1');
+        res.header('Pragma', 'no-cache');
 
-        if(req.query.type == 'item-attributes'){
-            file_metadata().then(function(file_metadata){
-                return search_metadata().then(function(search_metadata){
-                    if(req.query.type == search_metadata.item_attributes.type){
-                        let label = search_metadata.item_attributes.name;
-                        let description = search_metadata.item_attributes.description;
-                        let type = search_metadata.item_attributes.type;
-                        let url = search_metadata.item_attributes.url;
-                        let table_headers = search_metadata.item_attributes.table_headers;
-                        let query_from_client = req.query.q;
+        if(req.userID && req.claim){
 
-                        let current_date = moment(new Date()).calendar();
+            let authenticity_token = jwt.sign({
+                id: uuidv4(),
+                claim: {
+                    signup: 'valid'
+                }
+            }, config.secret);
 
-                        if(req.query.q){
-                            return query_item_attributes().then(function(query_results){
+            let user_details = {
+                username: req.claim.username,
+                displayName: req.claim.displayName,
+                givenName: req.claim.givenName,
+                title: req.claim.title,
+                department: req.claim.department,
+                isAdmin: req.claim.isAdmin
+            }
 
-                                res.render('search_pn',{label, description, type, url, table_headers, file_metadata, search_metadata, query_results, query_from_client, current_date});
-                            });
-                        } else {
-                            let query_results = []
-                            res.render('search_pn',{label, description, type, url, table_headers, file_metadata, search_metadata, query_results, query_from_client, current_date});
-                        }
-                    }
-                });
-            });
-        } else if(req.query.type == 'po-status'){
-            file_metadata().then(function(file_metadata){
-                return search_metadata().then(function(search_metadata){
-                    let label = search_metadata.po_status.name;
-                    let description = search_metadata.po_status.description;
-                    let type = search_metadata.po_status.type;
-                    let url = search_metadata.po_status.url;
-                    let table_headers = search_metadata.po_status.table_headers;
-                    let query_from_client = req.query.q;
+            if(req.query.type == 'item-attributes'){
 
-                    let current_date = moment(new Date()).calendar();
+                if(user_details.isAdmin){
 
-                    if(req.query.q){
-                        return query_po_status().then(function(query_results){
-
-                            res.render('search_pn',{label, description, type, url, table_headers, file_metadata, search_metadata, query_results, query_from_client, current_date});
+                    file_metadata().then(function(file_metadata){
+                        return search_metadata().then(function(search_metadata){
+                            if(req.query.type == search_metadata.item_attributes.type){
+                                let label = search_metadata.item_attributes.name;
+                                let description = search_metadata.item_attributes.description;
+                                let type = search_metadata.item_attributes.type;
+                                let url = search_metadata.item_attributes.url;
+                                let table_headers = search_metadata.item_attributes.table_headers;
+                                let query_from_client = req.query.q;
+        
+                                let current_date = moment(new Date()).calendar();
+        
+                                if(req.query.q){
+                                    return query_item_attributes().then(function(query_results){
+        
+                                        res.render('search_pn',{label, description, type, url, table_headers, file_metadata, search_metadata, query_results, query_from_client, current_date, authenticity_token, user_details});
+                                    });
+                                } else {
+                                    let query_results = []
+                                    res.render('search_pn',{label, description, type, url, table_headers, file_metadata, search_metadata, query_results, query_from_client, current_date, authenticity_token, user_details});
+                                }
+                            }
                         });
-                    } else {
-                        let query_results = []
-                        res.render('search_pn',{label, description, type, url, table_headers, file_metadata, search_metadata, query_results, query_from_client, current_date});
-                    }
-                        
-                });
-            });
-        } else if(req.query.type == 'on-hand'){
-            file_metadata().then(function(file_metadata){
-                return search_metadata().then(function(search_metadata){
-                    if(req.query.type == search_metadata.on_hand.type){
-                        let label = search_metadata.on_hand.name;
-                        let description = search_metadata.on_hand.description;
-                        let type = search_metadata.on_hand.type;
-                        let url = search_metadata.on_hand.url;
-                        let table_headers = search_metadata.on_hand.table_headers;
+                    });
+
+                } else {
+
+                    let file_metadata = null;
+                    search_metadata().then(function(search_metadata){
+                        if(req.query.type == search_metadata.item_attributes.type){
+                            let label = search_metadata.item_attributes.name;
+                            let description = search_metadata.item_attributes.description;
+                            let type = search_metadata.item_attributes.type;
+                            let url = search_metadata.item_attributes.url;
+                            let table_headers = search_metadata.item_attributes.table_headers;
+                            let query_from_client = req.query.q;
+    
+                            let current_date = moment(new Date()).calendar();
+    
+                            if(req.query.q){
+                                return query_item_attributes().then(function(query_results){
+    
+                                    res.render('search_pn',{label, description, type, url, table_headers, file_metadata, search_metadata, query_results, query_from_client, current_date, authenticity_token, user_details});
+                                });
+                            } else {
+                                let query_results = []
+                                res.render('search_pn',{label, description, type, url, table_headers, file_metadata, search_metadata, query_results, query_from_client, current_date, authenticity_token, user_details});
+                            }
+                        }
+                    });
+                }
+    
+            } else if(req.query.type == 'po-status'){
+                if(user_details.isAdmin){ 
+
+                    file_metadata().then(function(file_metadata){
+                        return search_metadata().then(function(search_metadata){
+                            let label = search_metadata.po_status.name;
+                            let description = search_metadata.po_status.description;
+                            let type = search_metadata.po_status.type;
+                            let url = search_metadata.po_status.url;
+                            let table_headers = search_metadata.po_status.table_headers;
+                            let query_from_client = req.query.q;
+        
+                            let current_date = moment(new Date()).calendar();
+        
+                            if(req.query.q){
+                                return query_po_status().then(function(query_results){
+        
+                                    res.render('search_pn',{label, description, type, url, table_headers, file_metadata, search_metadata, query_results, query_from_client, current_date, authenticity_token, user_details});
+                                });
+                            } else {
+                                let query_results = []
+                                res.render('search_pn',{label, description, type, url, table_headers, file_metadata, search_metadata, query_results, query_from_client, current_date, authenticity_token, user_details});
+                            }
+                                
+                        });
+                    });
+
+                } else {
+                    let file_metadata = null;
+                    
+                    search_metadata().then(function(search_metadata){
+                        let label = search_metadata.po_status.name;
+                        let description = search_metadata.po_status.description;
+                        let type = search_metadata.po_status.type;
+                        let url = search_metadata.po_status.url;
+                        let table_headers = search_metadata.po_status.table_headers;
                         let query_from_client = req.query.q;
     
                         let current_date = moment(new Date()).calendar();
     
                         if(req.query.q){
-                            return query_on_hand().then(function(query_results){
+                            return query_po_status().then(function(query_results){
     
-                                res.render('search_pn',{label, description, type, url, table_headers, file_metadata, search_metadata, query_results, query_from_client, current_date});
+                                res.render('search_pn',{label, description, type, url, table_headers, file_metadata, search_metadata, query_results, query_from_client, current_date, authenticity_token, user_details});
                             });
                         } else {
                             let query_results = []
-                            res.render('search_pn',{label, description, type, url, table_headers, file_metadata, search_metadata, query_results, query_from_client, current_date});
+                            res.render('search_pn',{label, description, type, url, table_headers, file_metadata, search_metadata, query_results, query_from_client, current_date, authenticity_token, user_details});
                         }
-                    }
-                });
-            });
-        } else {
-            res.send('Invalid link');
+                            
+                    });
+                }
+
+            } else if(req.query.type == 'on-hand'){
+                if(user_details.isAdmin){
+
+                    file_metadata().then(function(file_metadata){
+                        return search_metadata().then(function(search_metadata){
+                            if(req.query.type == search_metadata.on_hand.type){
+                                let label = search_metadata.on_hand.name;
+                                let description = search_metadata.on_hand.description;
+                                let type = search_metadata.on_hand.type;
+                                let url = search_metadata.on_hand.url;
+                                let table_headers = search_metadata.on_hand.table_headers;
+                                let query_from_client = req.query.q;
+            
+                                let current_date = moment(new Date()).calendar();
+            
+                                if(req.query.q){
+                                    return query_on_hand().then(function(query_results){
+            
+                                        res.render('search_pn',{label, description, type, url, table_headers, file_metadata, search_metadata, query_results, query_from_client, current_date, authenticity_token, user_details});
+                                    });
+                                } else {
+                                    let query_results = []
+                                    res.render('search_pn',{label, description, type, url, table_headers, file_metadata, search_metadata, query_results, query_from_client, current_date, authenticity_token, user_details});
+                                }
+                            }
+                        });
+                    });
+
+                } else {
+                    let file_metadata = null;
+
+                    search_metadata().then(function(search_metadata){
+                        if(req.query.type == search_metadata.on_hand.type){
+                            let label = search_metadata.on_hand.name;
+                            let description = search_metadata.on_hand.description;
+                            let type = search_metadata.on_hand.type;
+                            let url = search_metadata.on_hand.url;
+                            let table_headers = search_metadata.on_hand.table_headers;
+                            let query_from_client = req.query.q;
+        
+                            let current_date = moment(new Date()).calendar();
+        
+                            if(req.query.q){
+                                return query_on_hand().then(function(query_results){
+        
+                                    res.render('search_pn',{label, description, type, url, table_headers, file_metadata, search_metadata, query_results, query_from_client, current_date, authenticity_token, user_details});
+                                });
+                            } else {
+                                let query_results = []
+                                res.render('search_pn',{label, description, type, url, table_headers, file_metadata, search_metadata, query_results, query_from_client, current_date, authenticity_token, user_details});
+                            }
+                        }
+                    });
+                }
+
+            } else {
+                res.send('Invalid link');
+            }
+
         }
+
+        
 
         /** item-attributes query */
         function query_item_attributes(){
@@ -391,7 +568,10 @@ module.exports = function(app){
 
     });
 
-    app.get('/uploader', function(req, res){
+    app.get('/uploader', verifyToken, function(req, res){
+        res.header('Cache-Control', 'private, no-cache, no-store, must-revalidate');
+        res.header('Expires', '-1');
+        res.header('Pragma', 'no-cache');
 
         /** FORMAT selection phase */
         if(req.query.format == 'APL'){
@@ -836,14 +1016,10 @@ module.exports = function(app){
         }
 
     });
+    /** end of routes */
 
-    app.get('/search', function(req, res){
-
-
-    });
-
-    /** POST UPLOADER ROUTES - under - /uploader */
-    app.post('/api/APL', function(req, res){
+    /** POST UPLOADER  - under - /uploader */
+    app.post('/api/APL', verifyToken, function(req, res){
 
         let form = new formidable.IncomingForm();
 
@@ -975,7 +1151,7 @@ module.exports = function(app){
 
     });
 
-    app.post('/api/SCAT', function(req, res){
+    app.post('/api/SCAT', verifyToken, function(req, res){
         
         let form = new formidable.IncomingForm();
 
@@ -1105,7 +1281,7 @@ module.exports = function(app){
         });
     });
     
-    app.post('/api/OH', function(req, res){
+    app.post('/api/OH', verifyToken, function(req, res){
         
         let form = new formidable.IncomingForm();
 
@@ -1239,7 +1415,7 @@ module.exports = function(app){
         });
     });
     
-    app.post('/api/PO', function(req, res){
+    app.post('/api/PO', verifyToken, function(req, res){
         
         let form = new formidable.IncomingForm();
 
@@ -1382,7 +1558,7 @@ module.exports = function(app){
         });
     });
     
-    app.post('/api/SCOST', function(req, res){
+    app.post('/api/SCOST', verifyToken, function(req, res){
         
         let form = new formidable.IncomingForm();
 
@@ -1512,7 +1688,7 @@ module.exports = function(app){
         });
     });
     
-    app.post('/api/SLLT', function(req, res){
+    app.post('/api/SLLT', verifyToken, function(req, res){
         
         let form = new formidable.IncomingForm();
 
@@ -1644,7 +1820,7 @@ module.exports = function(app){
         });
     });
     
-    app.post('/api/POR', function(req, res){
+    app.post('/api/POR', verifyToken, function(req, res){
         
         let form = new formidable.IncomingForm();
 
@@ -1776,11 +1952,4 @@ module.exports = function(app){
         form.on('error', function(err){
         });
     });
-
-    /* hidden chos
-    app.post('/api/POS', function(req, res){
-        
-        let form = new formidable.IncomingForm();
-    });
-    */
 }

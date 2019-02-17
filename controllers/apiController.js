@@ -111,7 +111,7 @@ module.exports = function(app){
                     description: 'PO',
                     table: 'po_data',
                     url: '/search?type=po-status',
-                    table_headers: ['Part Number', 'Description', 'Supplier', 'PO Number', 'PO Qty', 'PO Del', 'PO in transit', 'PO Bal', 'Promised Date', 'Auth Status', 'Upload Date']
+                    table_headers: ['Part Number', 'Description', 'Supplier', 'PO Number', 'PO Qty', 'PO Del', 'PO in transit', 'PO Bal', 'Promised Date', 'Auth Status', 'PO Upload Date']
                 },
 
                 on_hand:{
@@ -120,12 +120,29 @@ module.exports = function(app){
                     description: 'OH',
                     table: 'on_hand',
                     url: '/search?type=on-hand',
-                    table_headers: ['Org code', 'Part Number', 'Description', 'Sub Inventory', 'Locator', 'UOM', 'Qty', 'Upload Date']
+                    table_headers: ['Org code', 'Part Number', 'Description', 'Sub Inventory', 'Locator', 'UOM', 'Qty', 'OH Upload Date']
                 }
             }
 
 
             resolve(search_metadata);
+
+        });
+    }
+
+    /** metadata backup request form */
+    function request_metadata(){
+        return new Promise(function(resolve, reject){
+
+            let request_metadata = {
+
+                tool_group: ['AEM LOADER', 'AEM LOADER & UNLOADER' , 'AL TECH', 'AMB', 'ASTEC', 'AUTOMATION_BE', 'AUTOMATION_FE', 'BACCINI', 'Default', 'EDGECOAT', 'GLA', 'INNOLAS', 'JUSUNG', 'KURDEX', 'METRO', 'METRO - 4D', 'METRO - METAL LAB', 'MRL', 'MRL_FGA', 'MRL_PDRIVE', 'MRL_POLY', 'NPC', 'OLT', 'OTHER', 'OTHERS', 'PAL', 'RELIABILITY', 'RENA', 'RENA_BE', 'RENA_FE', 'S-THERM', 'SCM'],
+
+                process: ['DAMAGE', 'POLY', 'BSGDEP', 'NTM', 'NOXE', 'NDEP', 'PTM', 'TOXE', 'CLEANTEX', 'PDRIVE', 'ARC_BARC', 'PBA', 'LCM', 'SEED', 'FGA', 'PLM', 'EDG_CTR', 'PLATING', 'TEST'],
+
+            }
+
+            resolve(request_metadata);
 
         });
     }
@@ -446,7 +463,7 @@ module.exports = function(app){
                     if(err){return reject(err)};
 
                     connection.query({
-                        sql: 'SELECT * FROM (SELECT pn, supplier, po, po_qty, po_del, po_in_transit, po_bal, promised_dt, auth_status, upload_date FROM po_data WHERE upload_date = (SELECT MAX(upload_date) FROM po_data) AND auth_status != "NULL" AND po IN (?)) as pos JOIN (SELECT * FROM apl_data WHERE upload_date = (SELECT MAX(upload_date) FROM apl_data)) as apl ON apl.pn = pos.pn ',
+                        sql: 'SELECT * FROM (SELECT pn, supplier, po, po_qty, po_del, po_in_transit, po_bal, promised_dt, auth_status, upload_date as po_upload_date FROM po_data WHERE upload_date = (SELECT MAX(upload_date) FROM po_data) AND auth_status != "NULL" AND po IN (?)) as pos JOIN (SELECT * FROM apl_data WHERE upload_date = (SELECT MAX(upload_date) FROM apl_data)) as apl ON apl.pn = pos.pn ',
                         values: [uniq_pn_array()]
                     },  function(err, results){
                         if(err){return reject(err)};
@@ -468,7 +485,7 @@ module.exports = function(app){
                                     po_bal: results[i].po_bal,
                                     promised_dt: moment(results[i].promised_dt).format('llll'),
                                     auth_status: results[i].auth_status,
-                                    upload_date: moment(results[i].upload_date).format('llll')
+                                    upload_date: moment(results[i].po_upload_date).format('llll')
                                 });
                             }
     
@@ -477,7 +494,7 @@ module.exports = function(app){
                         } else {
 
                             connection.query({
-                                sql: 'SELECT * FROM (SELECT pn, supplier, po, po_qty, po_del, po_in_transit, po_bal, promised_dt, auth_status, upload_date FROM po_data WHERE upload_date = (SELECT MAX(upload_date) FROM po_data) AND auth_status != "NULL" AND pn IN (?)) as pos JOIN (SELECT * FROM apl_data WHERE upload_date = (SELECT MAX(upload_date) FROM apl_data)) as apl ON apl.pn = pos.pn  ',
+                                sql: 'SELECT * FROM (SELECT pn, supplier, po, po_qty, po_del, po_in_transit, po_bal, promised_dt, auth_status, upload_date as po_upload_date  FROM po_data WHERE upload_date = (SELECT MAX(upload_date) FROM po_data) AND auth_status != "NULL" AND pn IN (?)) as pos JOIN (SELECT * FROM apl_data WHERE upload_date = (SELECT MAX(upload_date) FROM apl_data)) as apl ON apl.pn = pos.pn  ',
                                 values: [uniq_pn_array()]
                             },  function(err, results){
                                 if(err){return reject(err)};
@@ -496,14 +513,14 @@ module.exports = function(app){
                                             po_bal: results[i].po_bal,
                                             promised_dt: moment(results[i].promised_dt).format('llll'),
                                             auth_status: results[i].auth_status,
-                                            upload_date: moment(results[i].upload_date).format('llll')
+                                            upload_date: moment(results[i].po_upload_date).format('llll')
                                         });
                                     }
             
                                     resolve(query_result);
                                 } else {
         
-        
+                                    resolve(query_result);
                                 }
         
                                 
@@ -536,7 +553,7 @@ module.exports = function(app){
                     if(err){return reject(err)};
 
                     connection.query({
-                        sql: 'SELECT * FROM (SELECT org_code, pn, subinv, locator, uom, qty, upload_date  FROM oh_data WHERE upload_date = (SELECT MAX(upload_date) FROM oh_data) AND pn IN (?)) as oh JOIN (SELECT * FROM apl_data WHERE upload_date = (SELECT MAX(upload_date) FROM apl_data)) as apl ON apl.pn = oh.pn ',
+                        sql: 'SELECT * FROM (SELECT org_code, pn, subinv, locator, uom, qty, upload_date as oh_upload_date FROM oh_data WHERE upload_date = (SELECT MAX(upload_date) FROM oh_data) AND pn IN (?)) as oh JOIN (SELECT * FROM apl_data WHERE upload_date = (SELECT MAX(upload_date) FROM apl_data)) as apl ON apl.pn = oh.pn ',
                         values: [uniq_pn_array()]
                     },  function(err, results){
                         if(err){return reject(err)};
@@ -552,7 +569,7 @@ module.exports = function(app){
                                 locator: results[i].locator,
                                 uom: results[i].uom,
                                 qty: results[i].qty,
-                                upload_date: moment(results[i].upload_date).format('llll')
+                                upload_date: moment(results[i].oh_upload_date).format('llll')
                             });
                         }
 

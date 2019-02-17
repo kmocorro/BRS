@@ -424,7 +424,13 @@
                                                             <td><%= query_results[i].po_in_transit %></td>
                                                             <td><%= query_results[i].po_bal %></td>
                                                             <td><%= query_results[i].promised_dt %></td>
-                                                            <td><%= query_results[i].auth_status %></td>
+                                                            <% if(query_results[i].auth_status == 'APPROVED') { %>
+                                                                <td><span class="label label-success"><%= query_results[i].auth_status %></span></td>
+                                                            <% } else if(query_results[i].auth_status == 'REJECTED') {  %>
+                                                                <td><span class="label label-danger"><%= query_results[i].auth_status %></span></td>  
+                                                            <% } else {  %>
+                                                                <td><span class="label label-warning"><%= query_results[i].auth_status %></span></td>
+                                                            <% } %>
                                                             <td><%= query_results[i].upload_date %></td>
                                                         </tr>
                                                     <% } %>

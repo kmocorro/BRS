@@ -79,6 +79,7 @@ module.exports = function(app){
                             let strategy = new LdapStrategy(OPTS);
                             passport.use(strategy);
                             passport.initialize();
+                            
 
                             res.render('index', passport.authenticate('ldapauth', function(err, user, info){
                                 if(err){
@@ -86,7 +87,7 @@ module.exports = function(app){
                                 } else if(!user){
                                     res.send({err: info.message});
                                 } else {
-                                    
+
                                     /** Admin feature only */
                                     function for_admins(){
                                         return new Promise(function(resolve, reject){

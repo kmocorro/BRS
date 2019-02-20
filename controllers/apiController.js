@@ -161,7 +161,7 @@ module.exports = function(app){
     });
 
     app.get('/logout', function(req, res){
-        res.cookie('auth', null);
+        res.cookie('auth_brs', null);
         res.redirect('/');
     });
 

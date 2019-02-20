@@ -137,7 +137,7 @@ module.exports = function(app){
         
                                             }, config.secret);
         
-                                            res.cookie('auth', token);
+                                            res.cookie('auth_brs', token);
                                             res.status(200).send({auth: 'Authenticated'});
 
                                         } else {
@@ -155,7 +155,7 @@ module.exports = function(app){
         
                                             }, config.secret);
         
-                                            res.cookie('auth', token);
+                                            res.cookie('auth_brs', token);
                                             res.status(200).send({auth: 'Authenticated'});
                                         }
                                     });

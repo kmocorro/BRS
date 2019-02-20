@@ -83,7 +83,7 @@ module.exports = function(app){
 
                             res.render('index', passport.authenticate('ldapauth', function(err, user, info){
                                 if(err){
-                                    res.send({err: err});
+                                    res.send({err: 'This is an error ' +err});
                                 } else if(!user){
                                     res.send({err: info.message});
                                 } else {

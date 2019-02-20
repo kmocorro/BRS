@@ -8,7 +8,7 @@ let uuidv4 = require('uuid/v4');
  *  
  */
 function verifyToken(req, res, next){
-    let token = req.cookies.auth;
+    let token = req.cookies.auth_brs;
     
     if(!token){
 
